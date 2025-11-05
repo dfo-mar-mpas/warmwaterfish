@@ -1,0 +1,90 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE, message=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+
+if(!require(librarian)) install.packages("librarian")
+pkgs <- c("targets",
+          "sf",
+          "leaflet",
+          "sf",
+          "ggplot2",
+          "patchwork",
+          "dplyr")
+librarian::shelf(pkgs)
+```
+
+# warmwaterfish
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+The goal of `warmwaterfish` is to look at the prevalence of warm-water fish species in coastal Nova Scotia under climate change.
+
+## Data Pipeline
+
+The data pipeline is built using the `targets` package. We use `targets` to avoid re-querying GBIF every time we want to run the script (i.e. it will only re-query if we change the query it). For a quick tutorial on targets, see Jaimie Harbin's [demo](https://github.com/AtlanticR/bioRworkshops/blob/master/22_targets/targets.Rmd) or the targets [website](https://books.ropensci.org/targets/).
+
+The main points to know are that the code for the pipeline is in `_targets.R` and the data are stored in the `_targets/objects` folder. To run the entire pipeline, just run `targets::tar_make()` in the R console. To see the status of the pipeline, run `targets::tar_visnetwork()`. To load the output of a target into your R session, run `targets::tar_load(<target_name>)` or `targets::tar_load_everything()`.
+
+```{r}
+tar_load(c(inatdata,maritimes))
+tar_visnetwork()
+```
+
+## Example Plots
+
+Species counts:
+```{r}
+ggplot(inatdata)+
+  geom_bar(aes(species))+
+  #rotate x-labels 90
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))+
+  theme_minimal()
+```
+
+User contributions:
+```{r}
+ggplot(inatdata)+
+  geom_bar(aes(recordedBy))+
+  #rotate x-labels 90
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))+
+  theme_minimal()
+```
+
+Spatial distribution of observations:
+```{r}
+p1 <- ggplot(inatdata)+
+  geom_bar(aes(round(decimalLatitude*4)/4))+
+  coord_flip()+
+  theme_minimal()
+
+p2 <- ggplot(maritimes)+
+  geom_sf()+
+  geom_sf(data= inatdata, aes(color=species), size=2, alpha=0.7)+
+  theme_minimal()
+p1 + p2
+```
+
+Heatmap of observation density:
+```{r, warning=FALSE}
+
+ggplot(maritimes) +
+  geom_sf() +
+  stat_sf_coordinates(data = inatdata) +
+  geom_hex(data = inatdata, 
+           aes(x = decimalLongitude, y = decimalLatitude), 
+           alpha = 0.7, 
+           bins = 30) +
+  scale_fill_viridis_c(name = "Sightings\nDensity") +
+  facet_wrap(~species) +
+  theme_minimal()
+```
+
