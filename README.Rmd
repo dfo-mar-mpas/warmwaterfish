@@ -17,7 +17,8 @@ pkgs <- c("targets",
           "sf",
           "ggplot2",
           "patchwork",
-          "dplyr")
+          "dplyr",
+          "lubridate")
 librarian::shelf(pkgs)
 ```
 
@@ -50,6 +51,18 @@ ggplot(inatdata)+
   ylab(label="Count")+
   theme_bw()+
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))
+```
+Species by year
+
+```{r}
+ggplot(inatdata)+
+  geom_bar(aes(species))+
+  #rotate x-labels 90
+  facet_wrap(~lubridate::year(eventDate))+
+  xlab(label = "Species")+
+  ylab(label="Count")+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5), strip.background = element_rect(fill = "white", color = "black"))
 ```
 
 User contributions:
