@@ -46,8 +46,10 @@ Species counts:
 ggplot(inatdata)+
   geom_bar(aes(species))+
   #rotate x-labels 90
-  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))+
-  theme_minimal()
+  xlab(label = "Species")+
+  ylab(label="Count")+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))
 ```
 
 User contributions:
@@ -55,8 +57,8 @@ User contributions:
 ggplot(inatdata)+
   geom_bar(aes(recordedBy))+
   #rotate x-labels 90
-  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))+
-  theme_minimal()
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))
 ```
 
 Spatial distribution of observations:
@@ -64,13 +66,15 @@ Spatial distribution of observations:
 p1 <- ggplot(inatdata)+
   geom_bar(aes(round(decimalLatitude*4)/4))+
   coord_flip()+
+  ylab(label = "Degrees Latitude")+
   theme_minimal()
 
 p2 <- ggplot(maritimes)+
   geom_sf()+
-  geom_sf(data= inatdata, aes(color=species), size=2, alpha=0.7)+
-  theme_minimal()
-p1 + p2
+  geom_sf(data= inatdata, aes(fill=species), color="black",shape=21, size=2, alpha=0.7)+
+  theme_minimal()+
+  theme(legend.position = "bottom")
+p2 + p1
 ```
 
 Heatmap of observation density:
