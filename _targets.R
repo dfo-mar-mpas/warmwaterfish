@@ -4,6 +4,7 @@ pkgs <- c("targets",
           "arcpullr",
           "leaflet",
           "rgbif",
+          "rinat",
           "sf",
           "purrr",
           "dplyr")
@@ -82,6 +83,63 @@ list(
     command = {
       gbifdata |>
         filter(institutionCode == "iNaturalist")}
+  ),
+
+  tar_target(
+    name = rinatdata,
+    command = {
+      bbox <- st_bbox(simplemar)
+
+      inat_list <- map(
+        GBIF_keys$Taxon.Name,
+        \(taxon) {
+          tryCatch({
+            message("Fetching iNaturalist data for: ", taxon)
+
+            result <- get_inat_obs(
+              taxon_name = taxon,
+              bounds = c(bbox["ymin"], bbox["xmin"], bbox["ymax"], bbox["xmax"]),
+              quality = "research",
+              geo = TRUE,
+              maxresults = 10000
+            )
+
+            # get_inat_obs returns a 0-row data frame when no results
+            if(nrow(result) == 0) {
+              message("  No records found for ", taxon)
+              return(NULL)
+            }
+
+            message("  Found ", nrow(result), " records for ", taxon)
+            return(result)
+
+          }, error = function(e) {
+            message("  Error or no records for ", taxon, ": ", e$message)
+            return(NULL)
+          })
+        }
+      )
+
+
+      # Combine all results
+      inat_data <- inat_list |>
+        bind_rows()
+
+      # Convert to sf object and spatial join
+      if(nrow(inat_data) > 0) {
+        inat_sf <- inat_data |>
+          st_as_sf(
+            coords = c("longitude", "latitude"),
+            crs = 4326,
+            remove = FALSE
+          ) |>
+          st_join(maritimes, join = st_within)
+      } else {
+        inat_sf <- NULL
+      }
+
+      inat_sf
+    }
   )
 )
 

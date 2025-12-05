@@ -28,11 +28,11 @@ session, run `targets::tar_load(<target_name>)` or
 `targets::tar_load_everything()`.
 
 ``` r
-tar_load(c(inatdata,maritimes))
+tar_load(c(rinatdata,inatdata,maritimes))
 tar_visnetwork()
 #> Loading required package: librarian
 #> PhantomJS not found. You can install it with webshot::install_phantomjs(). If it is installed, please make sure the phantomjs executable can be found via the PATH variable.
-#> file:///C:/Users/DaigleR/AppData/Local/Temp/1/RtmpOEZUWi/file6a0853171794/widget6a082a1b2b3c.html screenshot completed
+#> file:///C:/Users/DaigleR/AppData/Local/Temp/1/Rtmpo7sd5u/file3dd8660c6471/widget3dd8fda7c83.html screenshot completed
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
@@ -50,6 +50,17 @@ ggplot(inatdata)+
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+
+``` r
+
+ggplot(rinatdata)+
+  geom_bar(aes(scientific_name))+
+  #rotate x-labels 90
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))+
+  theme_minimal()
+```
+
+![](README_files/figure-gfm/unnamed-chunk-3-2.png)<!-- -->
 
 User contributions:
 

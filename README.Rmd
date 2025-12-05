@@ -35,7 +35,7 @@ The data pipeline is built using the `targets` package. We use `targets` to avoi
 The main points to know are that the code for the pipeline is in `_targets.R` and the data are stored in the `_targets/objects` folder. To run the entire pipeline, just run `targets::tar_make()` in the R console. To see the status of the pipeline, run `targets::tar_visnetwork()`. To load the output of a target into your R session, run `targets::tar_load(<target_name>)` or `targets::tar_load_everything()`.
 
 ```{r}
-tar_load(c(inatdata,maritimes))
+tar_load(c(rinatdata,inatdata,maritimes))
 tar_visnetwork()
 ```
 
@@ -45,6 +45,12 @@ Species counts:
 ```{r}
 ggplot(inatdata)+
   geom_bar(aes(species))+
+  #rotate x-labels 90
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))+
+  theme_minimal()
+
+ggplot(rinatdata)+
+  geom_bar(aes(scientific_name))+
   #rotate x-labels 90
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))+
   theme_minimal()
