@@ -17,7 +17,8 @@ pkgs <- c("targets",
           "sf",
           "ggplot2",
           "patchwork",
-          "dplyr")
+          "dplyr",
+          "lubridate")
 librarian::shelf(pkgs)
 ```
 
@@ -35,7 +36,7 @@ The data pipeline is built using the `targets` package. We use `targets` to avoi
 The main points to know are that the code for the pipeline is in `_targets.R` and the data are stored in the `_targets/objects` folder. To run the entire pipeline, just run `targets::tar_make()` in the R console. To see the status of the pipeline, run `targets::tar_visnetwork()`. To load the output of a target into your R session, run `targets::tar_load(<target_name>)` or `targets::tar_load_everything()`.
 
 ```{r}
-tar_load(c(rinatdata,inatdata,maritimes))
+tar_load(c(gbifdata,rinatdata,inatdata,maritimes))
 tar_visnetwork()
 ```
 
@@ -45,15 +46,36 @@ Species counts:
 ```{r}
 ggplot(inatdata)+
   geom_bar(aes(species))+
-  #rotate x-labels 90
-  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))+
-  theme_minimal()
+  xlab(label = "Species (all GBIF)")+
+  ylab(label="Count")+
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))
+
+ggplot(inatdata)+
+  geom_bar(aes(species))+
+  xlab(label = "Species (iNaturalist via GBIF)")+
+  ylab(label="Count")+
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))
 
 ggplot(rinatdata)+
   geom_bar(aes(scientific_name))+
+  xlab(label = "Species (direct iNaturalist query)")+
+  ylab(label="Count")+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))
+```
+Species by year
+
+```{r}
+ggplot(inatdata)+
+  geom_bar(aes(species))+
   #rotate x-labels 90
-  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))+
-  theme_minimal()
+  facet_wrap(~lubridate::year(eventDate))+
+  xlab(label = "Species")+
+  ylab(label="Count")+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5), strip.background = element_rect(fill = "white", color = "black"))
 ```
 
 User contributions:
@@ -61,8 +83,8 @@ User contributions:
 ggplot(inatdata)+
   geom_bar(aes(recordedBy))+
   #rotate x-labels 90
-  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))+
-  theme_minimal()
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))
 ```
 
 Spatial distribution of observations:
@@ -70,13 +92,15 @@ Spatial distribution of observations:
 p1 <- ggplot(inatdata)+
   geom_bar(aes(round(decimalLatitude*4)/4))+
   coord_flip()+
+  ylab(label = "Degrees Latitude")+
   theme_minimal()
 
 p2 <- ggplot(maritimes)+
   geom_sf()+
-  geom_sf(data= inatdata, aes(color=species), size=2, alpha=0.7)+
-  theme_minimal()
-p1 + p2
+  geom_sf(data= inatdata, aes(fill=species), color="black",shape=21, size=2, alpha=0.7)+
+  theme_minimal()+
+  theme(legend.position = "bottom")
+p2 + p1
 ```
 
 Heatmap of observation density:

@@ -28,11 +28,11 @@ session, run `targets::tar_load(<target_name>)` or
 `targets::tar_load_everything()`.
 
 ``` r
-tar_load(c(rinatdata,inatdata,maritimes))
+tar_load(c(gbifdata,rinatdata,inatdata,maritimes))
 tar_visnetwork()
 #> Loading required package: librarian
 #> PhantomJS not found. You can install it with webshot::install_phantomjs(). If it is installed, please make sure the phantomjs executable can be found via the PATH variable.
-#> file:///C:/Users/DaigleR/AppData/Local/Temp/1/Rtmpo7sd5u/file3dd8660c6471/widget3dd8fda7c83.html screenshot completed
+#> file:///C:/Users/DaigleR/AppData/Local/Temp/1/Rtmp0AKiem/file21d0c8033ce/widget21d0664145c7.html screenshot completed
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
@@ -44,23 +44,51 @@ Species counts:
 ``` r
 ggplot(inatdata)+
   geom_bar(aes(species))+
-  #rotate x-labels 90
-  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))+
-  theme_minimal()
+  xlab(label = "Species (all GBIF)")+
+  ylab(label="Count")+
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
 
 ``` r
 
-ggplot(rinatdata)+
-  geom_bar(aes(scientific_name))+
-  #rotate x-labels 90
-  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))+
-  theme_minimal()
+ggplot(inatdata)+
+  geom_bar(aes(species))+
+  xlab(label = "Species (iNaturalist via GBIF)")+
+  ylab(label="Count")+
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-3-2.png)<!-- -->
+
+``` r
+
+ggplot(rinatdata)+
+  geom_bar(aes(scientific_name))+
+  xlab(label = "Species (direct iNaturalist query)")+
+  ylab(label="Count")+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))
+```
+
+![](README_files/figure-gfm/unnamed-chunk-3-3.png)<!-- --> Species by
+year
+
+``` r
+ggplot(inatdata)+
+  geom_bar(aes(species))+
+  #rotate x-labels 90
+  facet_wrap(~lubridate::year(eventDate))+
+  xlab(label = "Species")+
+  ylab(label="Count")+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5), strip.background = element_rect(fill = "white", color = "black"))
+```
+
+![](README_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
 
 User contributions:
 
@@ -68,11 +96,11 @@ User contributions:
 ggplot(inatdata)+
   geom_bar(aes(recordedBy))+
   #rotate x-labels 90
-  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))+
-  theme_minimal()
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
 Spatial distribution of observations:
 
@@ -80,16 +108,18 @@ Spatial distribution of observations:
 p1 <- ggplot(inatdata)+
   geom_bar(aes(round(decimalLatitude*4)/4))+
   coord_flip()+
+  ylab(label = "Degrees Latitude")+
   theme_minimal()
 
 p2 <- ggplot(maritimes)+
   geom_sf()+
-  geom_sf(data= inatdata, aes(color=species), size=2, alpha=0.7)+
-  theme_minimal()
-p1 + p2
+  geom_sf(data= inatdata, aes(fill=species), color="black",shape=21, size=2, alpha=0.7)+
+  theme_minimal()+
+  theme(legend.position = "bottom")
+p2 + p1
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
 
 Heatmap of observation density:
 
@@ -107,4 +137,4 @@ ggplot(maritimes) +
   theme_minimal()
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
