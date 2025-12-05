@@ -32,7 +32,7 @@ tar_load(c(gbifdata,rinatdata,inatdata,maritimes))
 tar_visnetwork()
 #> Loading required package: librarian
 #> PhantomJS not found. You can install it with webshot::install_phantomjs(). If it is installed, please make sure the phantomjs executable can be found via the PATH variable.
-#> file:///C:/Users/DaigleR/AppData/Local/Temp/1/Rtmp0AKiem/file21d0c8033ce/widget21d0664145c7.html screenshot completed
+#> file:///C:/Users/DaigleR/AppData/Local/Temp/1/RtmpATAYpZ/file6ae8bec7f9a/widget6ae832f124b8.html screenshot completed
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
@@ -42,7 +42,7 @@ tar_visnetwork()
 Species counts:
 
 ``` r
-ggplot(inatdata)+
+ggplot(gbifdata)+
   geom_bar(aes(species))+
   xlab(label = "Species (all GBIF)")+
   ylab(label="Count")+

@@ -44,7 +44,7 @@ tar_visnetwork()
 
 Species counts:
 ```{r}
-ggplot(inatdata)+
+ggplot(gbifdata)+
   geom_bar(aes(species))+
   xlab(label = "Species (all GBIF)")+
   ylab(label="Count")+
