@@ -1,10 +1,3 @@
 name|type|parent|branches|progress
-file_GBIF_keys.csv|stem|file_GBIF_keys.csv|0|skipped
-maritimes|stem|maritimes|0|skipped
-ns_coast|stem|ns_coast|0|skipped
-GBIF_keys|stem|GBIF_keys|0|skipped
-simplemar|stem|simplemar|0|skipped
-rinatdata|stem|rinatdata|0|skipped
-gbifdownload|stem|gbifdownload|0|skipped
-gbifdata|stem|gbifdata|0|skipped
-inatdata|stem|inatdata|0|skipped
+ns_coast|stem|ns_coast|0|dispatched
+ns_coast|stem|ns_coast|0|completed
