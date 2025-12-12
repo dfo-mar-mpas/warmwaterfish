@@ -28,11 +28,11 @@ session, run `targets::tar_load(<target_name>)` or
 `targets::tar_load_everything()`.
 
 ``` r
-tar_load(c(gbifdata,rinatdata,inatdata,maritimes))
+tar_load(c(gbifdata,rinatdata,inatdata,maritimes,ns_coast))
 tar_visnetwork()
 #> Loading required package: librarian
 #> PhantomJS not found. You can install it with webshot::install_phantomjs(). If it is installed, please make sure the phantomjs executable can be found via the PATH variable.
-#> file:///C:/Users/DaigleR/AppData/Local/Temp/1/RtmpATAYpZ/file6ae8bec7f9a/widget6ae832f124b8.html screenshot completed
+#> file:///C:/Users/DaigleR/AppData/Local/Temp/1/RtmpWakrbp/file75002fbe15a5/widget75001e0b4677.html screenshot completed
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
@@ -78,7 +78,7 @@ ggplot(rinatdata)+
 year
 
 ``` r
-ggplot(inatdata)+
+ggplot(inatdata %>% filter(year>2000, !species==""))+
   geom_bar(aes(species))+
   #rotate x-labels 90
   facet_wrap(~lubridate::year(eventDate))+
@@ -111,9 +111,10 @@ p1 <- ggplot(inatdata)+
   ylab(label = "Degrees Latitude")+
   theme_minimal()
 
-p2 <- ggplot(maritimes)+
+p2 <- ggplot(ns_coast)+
   geom_sf()+
-  geom_sf(data= inatdata, aes(fill=species), color="black",shape=21, size=2, alpha=0.7)+
+  geom_sf(data= inatdata %>% filter(decimalLatitude>42.8), aes(fill=species), color="black",shape=21, size=2, alpha=0.7)+
+  xlab(label = "Number of Observations")+
   theme_minimal()+
   theme(legend.position = "bottom")
 p2 + p1

@@ -32,6 +32,13 @@ list(
   ),
 
   tar_target(
+    name = ns_coast,
+    command = {
+      st_read("data/NS_coastline_project_Erase1 1.shp")
+    }
+  ),
+
+  tar_target(
     name = file_GBIF_keys.csv,
     command = "data/GBIF_keys.csv",
     format = "file"

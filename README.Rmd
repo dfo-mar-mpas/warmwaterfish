@@ -36,7 +36,7 @@ The data pipeline is built using the `targets` package. We use `targets` to avoi
 The main points to know are that the code for the pipeline is in `_targets.R` and the data are stored in the `_targets/objects` folder. To run the entire pipeline, just run `targets::tar_make()` in the R console. To see the status of the pipeline, run `targets::tar_visnetwork()`. To load the output of a target into your R session, run `targets::tar_load(<target_name>)` or `targets::tar_load_everything()`.
 
 ```{r}
-tar_load(c(gbifdata,rinatdata,inatdata,maritimes))
+tar_load(c(gbifdata,rinatdata,inatdata,maritimes,ns_coast))
 tar_visnetwork()
 ```
 
@@ -95,9 +95,10 @@ p1 <- ggplot(inatdata)+
   ylab(label = "Degrees Latitude")+
   theme_minimal()
 
-p2 <- ggplot(maritimes)+
+p2 <- ggplot(ns_coast)+
   geom_sf()+
   geom_sf(data= inatdata %>% filter(decimalLatitude>42.8), aes(fill=species), color="black",shape=21, size=2, alpha=0.7)+
+  xlab(label = "Number of Observations")+
   theme_minimal()+
   theme(legend.position = "bottom")
 p2 + p1
