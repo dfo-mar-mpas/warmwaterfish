@@ -68,7 +68,7 @@ ggplot(rinatdata)+
 Species by year
 
 ```{r}
-ggplot(inatdata)+
+ggplot(inatdata %>% filter(year>2000, !species==""))+
   geom_bar(aes(species))+
   #rotate x-labels 90
   facet_wrap(~lubridate::year(eventDate))+
@@ -97,7 +97,7 @@ p1 <- ggplot(inatdata)+
 
 p2 <- ggplot(maritimes)+
   geom_sf()+
-  geom_sf(data= inatdata, aes(fill=species), color="black",shape=21, size=2, alpha=0.7)+
+  geom_sf(data= inatdata %>% filter(decimalLatitude>42.8), aes(fill=species), color="black",shape=21, size=2, alpha=0.7)+
   theme_minimal()+
   theme(legend.position = "bottom")
 p2 + p1

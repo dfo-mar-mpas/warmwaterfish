@@ -3,10 +3,8 @@ file_GBIF_keys.csv|stem|file_GBIF_keys.csv|0|skipped
 maritimes|stem|maritimes|0|skipped
 GBIF_keys|stem|GBIF_keys|0|skipped
 simplemar|stem|simplemar|0|skipped
-rinatdata|stem|rinatdata|0|skipped
-gbifdownload|stem|gbifdownload|0|dispatched
-gbifdownload|stem|gbifdownload|0|completed
-gbifdata|stem|gbifdata|0|dispatched
-gbifdata|stem|gbifdata|0|completed
-inatdata|stem|inatdata|0|dispatched
-inatdata|stem|inatdata|0|completed
+rinatdata|stem|rinatdata|0|dispatched
+rinatdata|stem|rinatdata|0|completed
+gbifdownload|stem|gbifdownload|0|skipped
+gbifdata|stem|gbifdata|0|skipped
+inatdata|stem|inatdata|0|skipped
