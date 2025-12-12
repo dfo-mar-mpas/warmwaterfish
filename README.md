@@ -32,7 +32,7 @@ tar_load(c(gbifdata,rinatdata,inatdata,maritimes,ns_coast))
 tar_visnetwork()
 #> Loading required package: librarian
 #> PhantomJS not found. You can install it with webshot::install_phantomjs(). If it is installed, please make sure the phantomjs executable can be found via the PATH variable.
-#> file:///C:/Users/DaigleR/AppData/Local/Temp/1/RtmpWakrbp/file75002fbe15a5/widget75001e0b4677.html screenshot completed
+#> file:///C:/Users/DaigleR/AppData/Local/Temp/1/RtmpAbk5p1/file354860e92f92/widget35485b69729d.html screenshot completed
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
@@ -105,16 +105,17 @@ ggplot(inatdata)+
 Spatial distribution of observations:
 
 ``` r
-p1 <- ggplot(inatdata)+
+latlimit <- 42.8
+p1 <- ggplot(inatdata%>% filter(decimalLatitude>latlimit))+
   geom_bar(aes(round(decimalLatitude*4)/4))+
   coord_flip()+
+  xlab(label = "Number of Observations")+
   ylab(label = "Degrees Latitude")+
   theme_minimal()
 
 p2 <- ggplot(ns_coast)+
   geom_sf()+
-  geom_sf(data= inatdata %>% filter(decimalLatitude>42.8), aes(fill=species), color="black",shape=21, size=2, alpha=0.7)+
-  xlab(label = "Number of Observations")+
+  geom_sf(data= inatdata %>% filter(decimalLatitude>latlimit), aes(fill=species), color="black",shape=21, size=2, alpha=0.7)+
   theme_minimal()+
   theme(legend.position = "bottom")
 p2 + p1
