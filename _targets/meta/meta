@@ -1,15 +1,19 @@
 name|type|data|command|depend|seed|path|time|size|bytes|format|repository|iteration|parent|children|seconds|warnings|error
-<<<<<<< Updated upstream|||||||||||||||||
-=======|||||||||||||||||
 file_GBIF_keys.csv|stem|e17aff1661af6e6f|7a320ea1f9f81a1a|2c530c1562a7fbd1|456294469|data/GBIF_keys.csv|t20397.641480437s|s851b|851|file|local|vector|||0||
 maritimes|stem|ce8b136d9f2d7672|895fdbfeb32bd36a|2c530c1562a7fbd1|-1453249263||t20397.7524593405s|s2651483b|2651483|rds|local|vector|||6.343|GDAL Message 1: +init=epsg:XXXX syntax is deprecated. It might return a CRS with a non-EPSG compliant axis order.|
 GBIF_keys|stem|8742ddc00c4583bd|13329dea3ac79b40|de2b52255c8f73ab|-817292659||t20397.752460251s|s634b|634|rds|local|vector|||0||
 simplemar|stem|9d29593f36a0ba25|15a5cdcf71e0793d|05133fa29d95c733|1491093668||t20397.7524678308s|s5553b|5553|rds|local|vector|||0.609||
-rinatdata|stem|7ba2ac0cfc3990e9|7612cf931e24bc42|54e7d8dee0cf69cd|1225562604||t20427.5827141613s|s46900b|46900|rds|local|vector|||19.203||
-gbifdownload|stem|def0da4a6b6e4bea|fdb3da282660590d|e881a9f8c5cf6d08|-632140451||t20427.5866087327s|s374b|374|rds|local|vector|||3.922||
-gbifdata|stem|5abac72aad2f8901|96c203c9598596b4|0b0408c4c0743b81|-481932426||t20427.5880139416s|s61463b|61463|rds|local|vector|||121.282||
-inatdata|stem|ff246e67c3066659|dc6be84c4135b53f|adfa5a3f9c551a13|1771808801||t20427.5880171987s|s23355b|23355|rds|local|vector|||0.015||
->>>>>>> Stashed changes|||||||||||||||||
-pkgs|object|62825e38793c7766
-.Random.seed|object|76b9fd30f766c24e
-ns_coast|stem|d22358764aaf6d3f|0dcbf36590321bb3|2c530c1562a7fbd1|1529978328||t20434.6936813045s|s8481449b|8481449|rds|local|vector|||0.344||
+nb_coast|stem|56deb671d72eb8de|8a4ccfd6c431c080|2c530c1562a7fbd1|-2085241372||t20481.6382105914s|s10456b|10456|rds|local|vector|||0.828||
+ns_coast|stem|10ba7120bd011e03|8a5b6e308f99295f|05133fa29d95c733|1529978328||t20481.6382477764s|s14848028b|14848028|rds|local|vector|||1.343||
+coastalmar|stem|d14a647f4cd82e33|c3a1f69c23182c3b|762ad87b200391ac|1043702493||t20481.7732250544s|s2602195b|2602195|rds|local|vector|||69.484|attribute variables are assumed to be spatially constant throughout all geometries|
+simplecoastalmar|stem|2c5f5ca12c0dc2f0|29fd2612e136c593|978d600d32f540f4|-1957134757||t20481.7732438404s|s4911b|4911|rds|local|vector|||1.188||
+rinatdata|stem|b7f50504aec6eaf1|d58096febbe700c1|225ed037a52d0ddd|1225562604||t20481.7736981702s|s44702b|44702|rds|local|vector|||38.219||
+gbifdownloadall|stem|135cc3206f270d3f|3236390e53892031|5471c5960f68ffd1|-1182125805||t20481.7737403295s|s375b|375|rds|local|vector|||3.469||
+gbifdownload|stem|6ad99a1aa4831f0f|23a688f859ebdd52|d0021d39458f1d37|-632140451||t20481.7737653157s|s374b|374|rds|local|vector|||1.937||
+gbifdataall|stem|64141bf0298f9435|0c0fd902dfcb21cd|be6c7bdb85b6aef3|1724041869||t20481.801485131s|s667169799b|667169799|rds|local|vector|||1927.094||
+gbifdata|stem|c28f222478dc6e38|96c203c9598596b4|d1bbc2faeb144992|-481932426||t20481.8015332311s|s33186b|33186|rds|local|vector|||2.969||
+inatdataall|stem|0509feda8de52749|37b58bb4a31d733f|5cc9b5a4e2b85c1e|1157474697||t20481.8033596406s|s61313578b|61313578|rds|local|vector|||0.641||
+inatdata|stem|971ffff3fa105400|dc6be84c4135b53f|aba3b33a3a1fed42|1771808801||t20481.8033617006s|s23724b|23724|rds|local|vector|||0||
+pkgs|object|d9186d265b55f3e7|||||||||||||||
+.Random.seed|object|f8b9c755adf7ab66|||||||||||||||
+marinekey|stem|c0b8ab51c97ae881|b7a510ddb721ee6d|6bd81576bae37db4|284675914||t20481.8408351651s|s92929b|92929|rds|local|vector|||2774.422||
