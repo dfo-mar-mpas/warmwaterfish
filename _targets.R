@@ -9,6 +9,7 @@ pkgs <- c("targets",
           "purrr",
           "rnaturalearth",
           "worrms",
+          "qs",
           "dplyr")
 librarian::shelf(pkgs)
 
@@ -101,71 +102,14 @@ list(
     command = {
       occ_download_wait(gbifdownloadall)
 
-      occ_download_import(occ_download_get(gbifdownloadall)) |>
+      gbif <- occ_download_import(occ_download_get(gbifdownloadall)) |>
         st_as_sf(
           coords = c("decimalLongitude", "decimalLatitude"),
           crs = 4326,
           remove = FALSE
         ) |>
-        st_join(coastalmar, join = st_within)    }
-  ),
-
-  tar_target(
-    name = gbifdownload,
-    command = {
-      taxon_preds <- map2(
-        GBIF_keys$Taxon.Level,
-        GBIF_keys$GBIF.Key,
-        \(x, y) pred_in(paste0(x, "Key"), y)
-      )
-
-      occ_download(
-        pred_within(st_as_text(simplecoastalmar$geoms)),
-        pred("hasCoordinate", TRUE),
-        pred("hasGeospatialIssue", FALSE),
-        do.call(pred_or, taxon_preds),
-        format = "SIMPLE_CSV",
-        user = Sys.getenv("GBIF_USER"),
-        pwd = Sys.getenv("GBIF_PWD"),
-        email = Sys.getenv("GBIF_EMAIL")
-      )
-    }
-  ),
-
-  tar_target(
-    name = gbifdata,
-    command = {
-      occ_download_wait(gbifdownload)
-
-      inat <- occ_download_import(occ_download_get(gbifdownload)) |>
-        st_as_sf(
-          coords = c("decimalLongitude", "decimalLatitude"),
-          crs = 4326,
-          remove = FALSE
-        ) |>
-        st_join(maritimes, join = st_within)    }
-  ),
-
-  tar_target(
-    name = inatdata,
-    command = {
-      gbifdata |>
-        filter(institutionCode == "iNaturalist")
-      }
-  ),
-
-  tar_target(
-    name = inatdataall,
-    command = {
-      gbifdataall |>
-        filter(institutionCode == "iNaturalist")
-      }
-  ),
-
-  tar_target(
-    name = marinekey,
-    command = {
-      test <- inatdataall %>%
+        st_join(coastalmar, join = st_within) |>
+        select(where(~n_distinct(., na.rm = TRUE) > 1)) |> # remove useless columns
         mutate(
           # Determine which name to use based on taxonomic rank and availability
           name_to_check = case_when(
@@ -187,7 +131,11 @@ list(
 
             TRUE ~ NA_character_
           )
-        ) |>
+        )
+
+
+
+      marinekey <- gbif |>
         pull(name_to_check) |>
         unique() |>
         sort() |>
@@ -252,7 +200,68 @@ list(
           })
         }) |>
         bind_rows()
+
+
+      gbif |>
+        left_join(marinekey, by = "name_to_check") |>
+        filter(is_marine == 1) |>
+        select(-names(marinekey))
+
+
+
+      }
+  ),
+
+  tar_target(
+    name = gbifdownload,
+    command = {
+      taxon_preds <- map2(
+        GBIF_keys$Taxon.Level,
+        GBIF_keys$GBIF.Key,
+        \(x, y) pred_in(paste0(x, "Key"), y)
+      )
+
+      occ_download(
+        pred_within(st_as_text(simplecoastalmar$geoms)),
+        pred("hasCoordinate", TRUE),
+        pred("hasGeospatialIssue", FALSE),
+        do.call(pred_or, taxon_preds),
+        format = "SIMPLE_CSV",
+        user = Sys.getenv("GBIF_USER"),
+        pwd = Sys.getenv("GBIF_PWD"),
+        email = Sys.getenv("GBIF_EMAIL")
+      )
     }
+  ),
+
+  tar_target(
+    name = gbifdata,
+    command = {
+      occ_download_wait(gbifdownload)
+
+      inat <- occ_download_import(occ_download_get(gbifdownload)) |>
+        st_as_sf(
+          coords = c("decimalLongitude", "decimalLatitude"),
+          crs = 4326,
+          remove = FALSE
+        ) |>
+        st_join(maritimes, join = st_within)    }
+  ),
+
+  tar_target(
+    name = inatdata,
+    command = {
+      gbifdata |>
+        filter(institutionCode == "iNaturalist")
+      }
+  ),
+
+  tar_target(
+    name = inatdataall,
+    command = {
+      gbifdataall |>
+        filter(institutionCode == "iNaturalist")
+      }
   ),
 
   tar_target(

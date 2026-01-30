@@ -10,9 +10,9 @@ simplecoastalmar|stem|simplecoastalmar|0|skipped
 rinatdata|stem|rinatdata|0|skipped
 gbifdownloadall|stem|gbifdownloadall|0|skipped
 gbifdownload|stem|gbifdownload|0|skipped
-gbifdataall|stem|gbifdataall|0|skipped
+gbifdataall|stem|gbifdataall|0|dispatched
+gbifdataall|stem|gbifdataall|0|completed
 gbifdata|stem|gbifdata|0|skipped
-inatdataall|stem|inatdataall|0|skipped
+inatdataall|stem|inatdataall|0|dispatched
+inatdataall|stem|inatdataall|0|completed
 inatdata|stem|inatdata|0|skipped
-marinekey|stem|marinekey|0|dispatched
-marinekey|stem|marinekey|0|completed
