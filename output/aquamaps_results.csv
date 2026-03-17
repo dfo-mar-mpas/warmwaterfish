@@ -1,0 +1,54 @@
+species,weighted_lat,q95_lat,coastal_overlap,n_cells
+Acanthurus chirurgus,22.060467849900604,31.5,0,701
+Ariosoma anale,20.61447955502478,27,0,626
+Balistes vetula,22.74563939394414,32.5,0,911
+Bothus ocellatus,22.688822682483593,32.5,0,831
+Cantherhines pullus,22.28984995839782,32,0,774
+Carangoides bartholomaei,22.363975468502193,32.5,0,754
+Caranx crysos,23.66264448004885,34.5,0,1002
+Caranx hippos,23.98547527893469,36,0,1137
+Chaetodon capistratus,20.55884217475374,27,0,622
+Chaetodon ocellatus,21.961484009882092,30,0,688
+Cheilopogon furcatus,26.207393117294032,39.5,0,5722
+Cheilopogon melanurus,22.145863404719226,32,0,758
+Dactylopterus volitans,24.030688373924026,37,0,1192
+Decapterus macarellus,24.031354016938987,34.5,0,1159
+Decapterus punctatus,24.41633765205003,38.5,0,996
+Diodon holocanthus,22.837677180645787,33,0,993
+Epinephelus morio,22.011964656780947,29.5,0,822
+Fistularia tabacaria,23.86315868963282,36,0,1122
+Halieutichthys aculeatus,24.640632193130187,32,0,767
+Hemiramphus brasiliensis,22.04273604846968,31.5,0,624
+Heteropriacanthus cruentatus,22.16301317273904,30.5,0,860
+Hippocampus erectus,24.26646064953222,38.5,0,919
+Hirundichthys affinis,22.59522482874413,32,0,842
+Hyporthodus niveatus,22.108283343167972,31.5,0,893
+Lactophrys trigonus,22.47737876682601,32,0,771
+Lobotes surinamensis,25.04097836259506,35,0,912
+Lutjanus campechanus,23.193671919258513,33,0,881
+Lutjanus cyanopterus,22.55854066274875,32.5,0,795
+Megalops atlanticus,23.382971242985885,34.5,0,1114
+Mugil cephalus,26.190057858521794,41,0,1432
+Mugil curema,23.140560625193995,33.5,0,1051
+Nomeus gronovii,22.015467045542746,32.5,0,861
+Pogonias cromis,29.182850656983863,40.5,0,846
+Priacanthus arenatus,23.67037175181331,35,0,994
+Pristipomoides aquilonaris,22.381968516167255,31.5,0,886
+Pseudupeneus maculatus,22.594795204635744,32,0,819
+Remora remora,24.23760784882127,39.5,0,1516
+Rhizoprionodon terraenovae,23.36439531750951,33,0,922
+Selene setapinnis,24.5999671776314,38.5,0,916
+Selene vomer,24.003163072122376,36,0,829
+Seriola dumerili,23.44662381325106,35.5,0,1083
+Sphoeroides spengleri,22.778266482134843,32.5,0,819
+Stegastes partitus,20.752101685069,27,0,707
+Stephanolepis hispidus,24.91566990992824,40,0,1148
+Trachinotus falcatus,22.921559469585507,33,0,780
+Upeneus parvus,22.51229468106607,32,0,746
+Pristigenys,NA,NA,NA,0
+Sphyraenidae,23.38464120963059,33,0,876
+Seriola zonata,25.084909786562243,40.5,0,1137
+Peprilus triacanthus,NA,NA,NA,0
+Pristigenys alta,24.34959259613125,39,0,1005
+Sphyraena borealis,29.046843980078705,40.5,0,633
+NA,NA,NA,NA,0
