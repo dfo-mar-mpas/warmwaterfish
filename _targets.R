@@ -319,6 +319,50 @@ list(
 
       inat_sf
     }
+  ),
+
+  tar_target(
+    name = ns_species_atl_occ_download,
+    command = {
+      raresp <- gbifdataall |>
+        st_drop_geometry() |>
+        count(speciesKey, sort = TRUE) |>
+        filter(n<10,
+               !is.na(speciesKey)) |>
+        pull(speciesKey) |>
+        as.numeric()
+
+      bbox <- st_bbox(c(xmin = -100, xmax = -10, ymin = 10, ymax = 85), crs = 4326) |>
+        st_as_sfc() |>
+        st_as_text()
+
+
+
+      occ_download(
+        pred_within(bbox),
+        pred("hasCoordinate", TRUE),
+        pred("hasGeospatialIssue", FALSE),
+        pred_in("speciesKey", raresp),
+        format = "SIMPLE_CSV",
+        user = Sys.getenv("GBIF_USER"),
+        pwd = Sys.getenv("GBIF_PWD"),
+        email = Sys.getenv("GBIF_EMAIL")
+      )
+    }
+  ),
+
+  tar_target(
+    name = ns_species_atl_occ_data,
+    command = {
+      occ_download_wait(ns_species_atl_occ_download)
+
+      occ_download_import(occ_download_get(ns_species_atl_occ_download)) |>
+        st_as_sf(
+          coords = c("decimalLongitude", "decimalLatitude"),
+          crs = 4326,
+          remove = FALSE
+        )
+    }
   )
 )
 
