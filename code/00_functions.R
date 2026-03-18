@@ -443,6 +443,38 @@ resolve_aquamaps_species <- function(species, bound_box = NULL){
   ))
 }
 
+resolve_species_vector <- function(species_vec, bound_box = NULL){
+
+  n <- length(species_vec)
+  pb <- cli_progress_bar("Resolving species", total = n)
+
+  all_results <- list()
+
+  for(i in seq_along(species_vec)){
+    sp <- species_vec[i]
+
+    # Show which species is being processed
+    message("Processing: ", sp)
+
+    res <- resolve_aquamaps_species(sp, bound_box = bound_box)
+    all_results[[i]] <- res
+
+    # Update progress bar
+    cli_progress_update(pb, set = i)
+  }
+
+  cli_progress_done(pb)
+
+  # Combine all results into a single data frame
+  species_table <- bind_rows(all_results)
+  return(species_table)
+}
+
+# Example usage:
+# problem_species <- c("Synodus myops", "Gadus morhua", "Trachinocephalus myops")
+# species_table <- resolve_species_vector(problem_species)
+# head(species_table)
+
 ############################################################
 # ---- 3. Iterative + checkpoint-safe loop ----
 ############################################################
