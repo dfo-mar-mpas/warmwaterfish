@@ -130,7 +130,7 @@ gbif_name <- function(Taxon.Name,Taxon.Level){
 
 get_aquamaps_cells <- function(species, bound_box = NULL){
 
-  # Default Western Atlantic bounding box
+  # ---- Default Western Atlantic bounding box ----
   if(is.null(bound_box)){
     bound_box <- st_bbox(c(
       xmin = -100,
@@ -147,7 +147,6 @@ get_aquamaps_cells <- function(species, bound_box = NULL){
   )
 
   if(is.null(sp_match) || nrow(sp_match) == 0) return(NULL)
-
   sp_id <- sp_match$key[1]
 
   # ---- Pull raster ----
@@ -155,19 +154,27 @@ get_aquamaps_cells <- function(species, bound_box = NULL){
     am_raster(sp_id),
     error = function(e) return(NULL)
   )
-
   if(is.null(ras)) return(NULL)
 
-  # ---- Convert + crop ----
-  df <- ras %>%
-    terra::rast() %>%
-    terra::project("EPSG:4326") %>%
-    terra::crop(bound_box %>% st_as_sfc() %>% terra::vect()) %>%
-    terra::as.data.frame(xy = TRUE, na.rm = TRUE)
+  # ---- Convert to terra raster and project ----
+  r <- terra::rast(ras)
+  r <- terra::project(r, "EPSG:4326")
 
-  if(nrow(df) == 0) return(NULL)
+  # ---- Crop to bounding box ----
+  bb_vect <- terra::vect(st_as_sfc(bound_box))
+  r_crop <- tryCatch(
+    terra::crop(r, bb_vect),
+    error = function(e) return(NULL)
+  )
 
-  # ---- Standardize column names ----
+  # ---- Check for empty crop ----
+  if(is.null(r_crop)) return(NULL)
+  if(terra::ncell(r_crop) == 0) return(NULL)  # no overlapping cells
+
+  # ---- Convert to data.frame ----
+  df <- terra::as.data.frame(r_crop, xy = TRUE, na.rm = TRUE)
+
+  if(nrow(df) == 0) return(NULL)  # safety check
   names(df) <- c("lon", "lat", "probability")
 
   return(df)

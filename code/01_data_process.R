@@ -57,23 +57,13 @@ dir("_targets/objects/")
 #identify rare species
 # -------------------
 
-raresp <- gbif_flat |>
-          filter(phylum == "Chordata",
-                 !class %in% c("Myxini","Petromyzonti","Aves","Ascidiacea",
-                               "Mammalia","Thaliacea","Testudines","Squamata"),#just keep sharks and fish. for some reason fish do not have a consistent class
-                 species != "Lycodichthys dearborni")%>%  #This is a misnomer from the pull antarctic species that was mis assigned to the region
-          count(speciesKey, sort = TRUE) |>
-          filter(n<=20, #20 record threshold
-                 !is.na(speciesKey)) |>
-          pull(speciesKey) |>
-          as.numeric() #note that "Aulostomus"             "Trichinocephalus myops"
+  gbif_filtered <- gbif_flat %>%
+    filter(phylum == "Chordata",
+           !class %in% c("Myxini","Petromyzonti","Aves","Ascidiacea",
+                         "Mammalia","Thaliacea","Testudines","Squamata"),#just keep sharks and fish. for some reason fish do not have a consistent class
+           species != "Lycodichthys dearborni")
 
-
-raresp1 <- gbif_flat |>
-          filter(phylum == "Chordata",
-                 !class %in% c("Myxini","Petromyzonti","Aves","Ascidiacea",
-                               "Mammalia","Thaliacea","Testudines","Squamata"),#just keep sharks and fish. for some reason fish do not have a consistent class
-                 species != "Lycodichthys dearborni")%>%  #This is a misnomer from the pull antarctic species that was mis assigned to the region
+raresp1 <-  gbif_filtered %>%  #This is a misnomer from the pull antarctic species that was mis assigned to the region
           count(speciesKey, sort = TRUE)%>%
           filter(n<=30, #30 record threshold
                 !is.na(speciesKey))%>%
@@ -117,9 +107,7 @@ missing_targets <- c(
     }
 
   raresp <- c(raresp1%>%pull(speciesKey)%>%unique()%>%as.numeric,
-              missing_target_speciesKey%>%as.numeric(),
-              gbif_name("Sphyraena borealis","species")%>%as.numeric() #this is missing at the species level and is one of the species in the analysis
-              )
+              missing_target_speciesKey%>%as.numeric())
 
   #save the outputs
     write.csv(data.frame(speciesKey=raresp)%>%left_join(gbif_flat%>%
@@ -127,6 +115,25 @@ missing_targets <- c(
                                                    dplyr::select(speciesKey,kingdom,phylum,class,order,family,genus,species)),
           file = "output/rare_species_30obs.csv",row.names=FALSE)
 
+
+#### medium observation filter
+
+    medsp1 <- gbif_filtered%>%  #This is a misnomer from the pull antarctic species that was mis assigned to the region
+              count(speciesKey, sort = TRUE) %>%
+              filter(n<=2000, #2000 record threshold
+                     !is.na(speciesKey)) %>%
+              pull(speciesKey) %>%
+              as.numeric()%>%
+              setdiff(.,raresp)
+
+    med_species <- medsp1%>%
+                   data.frame(speciesKey=.)%>%
+                   left_join(gbif_filtered%>%
+                                distinct(speciesKey,.keep_all=TRUE)%>%
+                                dplyr::select(speciesKey,kingdom,phylum,class,order,family,genus,species))%>%
+                   left_join(gbif_filtered%>%  #This is a misnomer from the pull antarctic species that was mis assigned to the region
+                               count(speciesKey, sort = TRUE)%>%
+                               dplyr::select(speciesKey,n))
 
 #map out the study range------
 
@@ -256,28 +263,50 @@ missing_targets <- c(
         st_as_text()
 
       # #establish download key with gbif
-      # download_key <- occ_download(
-      #   pred_within(bbox), #for the box mapped above
-      #   pred("hasCoordinate", TRUE),
-      #   pred("hasGeospatialIssue", FALSE),
-      #   pred_in("speciesKey", raresp), #this is only for the records specified above
-      #   format = "SIMPLE_CSV",
-      #   user = Sys.getenv("GBIF_USER"),
-      #   pwd = Sys.getenv("GBIF_PWD"),
-      #   email = Sys.getenv("GBIF_EMAIL")
-      # )
-      #
-      # # check status of download key
-      # occ_download_meta(download_key)
-      #
-      # # when status == "SUCCEEDED"
-      # dat <- occ_download_get(download_key, path = "data/gbif_download", overwrite = FALSE)
+      download_key <- occ_download(
+        pred_within(bbox), #for the box mapped above
+        pred("hasCoordinate", TRUE),
+        pred("hasGeospatialIssue", FALSE),
+        pred_in("speciesKey", raresp), #this is only for the records specified above
+        format = "SIMPLE_CSV",
+        user = Sys.getenv("GBIF_USER"),
+        pwd = Sys.getenv("GBIF_PWD"),
+        email = Sys.getenv("GBIF_EMAIL")
+      )
+
+      # check status of download key
+      occ_download_meta(download_key)
+
+      # when status == "SUCCEEDED"
+      dat <- occ_download_get(download_key, path = "data/gbif_download", overwrite = FALSE)
       # save(dat,file="data/gbif_dat_get.RData")
+
+      #establish download key with gbif
+      download_key2 <- occ_download(
+        pred_within(bbox), #for the box mapped above
+        pred("hasCoordinate", TRUE),
+        pred("hasGeospatialIssue", FALSE),
+        pred_in("speciesKey", medsp1), #this is only for the records specified above
+        format = "SIMPLE_CSV",
+        user = Sys.getenv("GBIF_USER"),
+        pwd = Sys.getenv("GBIF_PWD"),
+        email = Sys.getenv("GBIF_EMAIL")
+      )
+
+      # check status of download key
+      occ_download_meta(download_key2)
+
+      # when status == "SUCCEEDED"
+      dat2 <- occ_download_get(download_key2, path = "data/gbif_download/med", overwrite = FALSE) #this seems to want to overwrite the low volume raresp one. so started in a new directory
+      save(dat2,file="data/gbif_dat_get_med.RData")
 
 #load the download
 # import as data frame
 load("data/gbif_dat_get.RData") #this is the pointer from the next set when it is loaded.
-gbif_df <- occ_download_import(dat)
+load("data/gbif_dat_get_med.RData")
+
+gbif_df1 <- occ_download_import(dat)
+gbif_df2 <- occ_download_import(dat2)
 
 #missing one species
 sennet <- (rgbif::occ_data(
@@ -289,17 +318,25 @@ sennet <- (rgbif::occ_data(
   mutate(class="Teleostei")
 
 sennet <- sennet%>%
-         dplyr::select(intersect(names(gbif_df),names(sennet)))
+         dplyr::select(intersect(names(gbif_df1),names(sennet)))
 
-save(sennet,file = "data/sennet_gbif_pull.RData")
+    #save(sennet,file = "data/sennet_gbif_pull.RData")
 
-#load("data/sennet_gbif_pull.RData")
+    #load("data/sennet_gbif_pull.RData")
 
 #now use the downloads to classify based on the observation based distributions
 
-gbif_df <- gbif_df %>%
-  dplyr::select(intersect(names(gbif_df),names(sennet)))%>%
-  rbind(.,sennet)
+gbif_df1 <- gbif_df1 %>%
+  dplyr::select(intersect(names(gbif_df1),names(sennet)))%>%
+  rbind(.,sennet)%>%
+  mutate(species_selection = "rare")
+
+gbif_df2 <- gbif_df2%>%
+            mutate(species_selection = "medium")%>%
+            dplyr::select(names(gbif_df1))
+
+gbif_df <- rbind(gbif_df1,gbif_df2)
+
 
 species_stats <- gbif_df %>%
   filter(phylum == "Chordata",
@@ -324,7 +361,7 @@ species_stats <- gbif_df %>%
   )%>%
   left_join(.,gbif_df%>%
               distinct(species,.keep_all=TRUE)%>%
-              dplyr::select(kingdom,phylum,class,order,genus,family,species,speciesKey))
+              dplyr::select(kingdom,phylum,class,order,genus,family,species,species_selection,speciesKey))
 
 #save the output --
 write.csv(species_stats,"output/species_stats.csv",row.names=FALSE)
@@ -350,6 +387,7 @@ con <- con_am("sqlite")
 tropical_species <- species_stats%>%
   filter(warm_flag == "tropical")
 
+#some species are missing from the GBIF pull from the warm water species table in the figure
 missing_targets <- c(
   setdiff(warm_sp_manual%>%filter(Taxon.Level=="genus")%>%pull(Taxon.Name),
           tropical_species%>%distinct(genus,.keep_all=TRUE)%>%pull(genus)),
@@ -366,26 +404,39 @@ missing_targets <- c(
                            species=="Sphyraenidae" ~ "Sphyraena borealis",
                            TRUE ~ species))
 
-
-
+#key out tropical species
 tropical_sp <- c(tropical_species%>%pull(species),missing_targets%>%pull(species2))
 
+#Run the extractions from Aquamaps. note any NA summaries means that the distribution from aquamps for that species is not within the bounding box of this analysis (western atlantic, north of the equator)
 aquamaps_results <- run_aquamaps_analysis(
-  species_vec = tropical_sp,
+  species_vec = c(species_stats$species,missing_targets%>%pull(species2)),
   coastal_sf = coastal_sf,
   prob_cutoff = threshold,
-  save_file="output/aquamaps_results.csv" #this cheecks to see if it has already been done
+  save_file="output/aquamaps_results.csv" #this checks to see if it has already been done
 )
 
-aquamaps_results <- read.csv("output/aquamaps_results.csv")%>% #reload and trim
-                   filter(species %in% tropical_sp)%>%
-                   mutate(warm_flag_am = case_when(
-                     q95_lat < 38 ~ "tropical",
-                     q95_lat < 41 ~ "southern_range_edge",
-                     q95_lat < 43.2 ~ "possible_warm_water",
-                     is.na(q95_lat) ~ NA,
-                     TRUE ~ "northern_species"
-                   ))
+
+aquamaps_results_rare <- read.csv("output/aquamaps_results.csv")%>% #reload and trim
+                         filter(species %in% tropical_sp)%>%
+                         mutate(warm_flag_am = case_when(
+                           q95_lat < 38 ~ "tropical",
+                           q95_lat < 41 ~ "southern_range_edge",
+                           q95_lat < 43.2 ~ "possible_warm_water",
+                           is.na(q95_lat) ~ NA,
+                           TRUE ~ "northern_species"
+                         ))%>%mutate(species_selection="rare")
+
+med_tropical_species <- species_stats%>%filter(species_selection=="medium",warm_flag == "tropical")
+
+aquamaps_results_med <- read.csv("output/aquamaps_results.csv")%>% #reload and trim
+                          filter(species %in% med_species$species)%>%
+                          mutate(warm_flag_am = case_when(
+                            q95_lat < 38 ~ "tropical",
+                            q95_lat < 41 ~ "southern_range_edge",
+                            q95_lat < 43.2 ~ "possible_warm_water",
+                            is.na(q95_lat) ~ NA,
+                            TRUE ~ "northern_species"
+                          ))%>%mutate(species_selection="medium")
 
 
 warm_water_summary <- species_stats%>%
