@@ -245,6 +245,203 @@ calc_coastal_overlap <- function(df, coastal_sf, prob_cutoff = 0){
     sum(df$probability, na.rm = TRUE)
 }
 
+############################################################
+# ---- clean up taxonomy to link to aqumaps ----
+############################################################
+
+library(rfishbase)
+library(rgbif)
+library(purrr)
+library(dplyr)
+
+resolve_aquamaps_species <- function(species, bound_box = NULL){
+  library(terra)
+  library(sf)
+  library(rfishbase)
+
+  # -----------------------------
+  # Default Western Atlantic bounding box
+  # -----------------------------
+  if(is.null(bound_box)){
+    bound_box <- st_bbox(c(
+      xmin = -100, xmax = -40,
+      ymin = 13,  ymax = 85
+    ), crs = st_crs(4326))
+  }
+
+  # -----------------------------
+  # FAO reference table
+  # -----------------------------
+  fao_ref <- data.frame(
+    AreaCode = c(18,21,27,31,34,37,41,47,48,51,57,58,61,67,71,77,81,87,88),
+    AreaName = c(
+      "Arctic Sea","Atlantic, Northwest","Atlantic, Northeast","Atlantic, Western Central",
+      "Atlantic, Eastern Central","Mediterranean and Black Sea","Atlantic, Southwest",
+      "Atlantic, Southeast","Atlantic, Antarctic","Indian Ocean, Western","Indian Ocean, Eastern",
+      "Indian Ocean, Antarctic and Southern","Pacific, Northwest","Pacific, Northeast",
+      "Pacific, Western Central","Pacific, Eastern Central","Pacific, Southwest",
+      "Pacific, Southeast","Pacific, Antarctic"
+    )
+  )
+  study_region_codes <- c(21,31) # Western Atlantic codes
+
+  # -----------------------------
+  # Helper: try AquaMaps
+  # -----------------------------
+  try_aquamaps <- function(name){
+    res <- tryCatch(am_search_fuzzy(name), error = function(e) NULL)
+    if(!is.null(res) && nrow(res) > 0){
+      terms_str <- res$terms[1]
+      sci_name <- NA_character_
+      if(!is.na(terms_str)){
+        split_terms <- strsplit(terms_str, " ")[[1]]
+        if(length(split_terms) >= 2) sci_name <- paste(split_terms[1:2], collapse = " ")
+      }
+      return(list(name = sci_name, key = res$key[1]))
+    }
+    return(NULL)
+  }
+
+  # -----------------------------
+  # 1. Try original name in AquaMaps
+  # -----------------------------
+  out <- try_aquamaps(species)
+  fao_region <- NA_character_
+  in_study_region <- NA
+
+  if(!is.null(out)){
+    ras <- tryCatch(am_raster(out$key), error = function(e) NULL)
+
+    if(!is.null(ras)){
+      ras <- terra::rast(ras) %>% terra::project("EPSG:4326")
+      bb_vect <- bound_box %>% st_as_sfc() %>% terra::vect()
+      ras_crop <- tryCatch(terra::crop(ras, bb_vect), error = function(e) NULL)
+
+      if(!is.null(ras_crop) && !is.na(sum(terra::values(ras_crop), na.rm = TRUE)) &&
+         sum(terra::values(ras_crop), na.rm = TRUE) > 0){
+        # Raster intersects bbox → success
+        return(data.frame(
+          input_name      = species,
+          matched_name    = out$name,
+          speciesKey      = out$key,
+          status          = "aquamaps_match",
+          FAO_region      = NA_character_,
+          in_study_region = NA,
+          country         = NA_character_
+        ))
+      } else {
+        # Raster exists but outside bbox → check FAO
+        fao_info <- tryCatch(faoareas(species), error = function(e) NULL)
+        if(!is.null(fao_info) && nrow(fao_info) > 0 && "AreaCode" %in% colnames(fao_info)){
+          fao_region <- paste(fao_ref$AreaName[fao_ref$AreaCode %in% fao_info$AreaCode], collapse = "_")
+          in_study_region <- any(fao_info$AreaCode %in% study_region_codes)
+        }
+        return(data.frame(
+          input_name      = species,
+          matched_name    = out$name,
+          speciesKey      = out$key,
+          status          = "aquamaps_outside_bbox",
+          FAO_region      = fao_region,
+          in_study_region = in_study_region,
+          country         = NA_character_
+        ))
+      }
+    } else {
+      # No raster → check FAO
+      fao_info <- tryCatch(faoareas(species), error = function(e) NULL)
+      if(!is.null(fao_info) && nrow(fao_info) > 0 && "AreaCode" %in% colnames(fao_info)){
+        fao_region <- paste(fao_ref$AreaName[fao_ref$AreaCode %in% fao_info$AreaCode], collapse = "_")
+        in_study_region <- any(fao_info$AreaCode %in% study_region_codes)
+      }
+      return(data.frame(
+        input_name      = species,
+        matched_name    = out$name,
+        speciesKey      = out$key,
+        status          = "aquamaps_no_raster",
+        FAO_region      = fao_region,
+        in_study_region = in_study_region,
+        country         = NA_character_
+      ))
+    }
+  }
+
+  # -----------------------------
+  # 2. FishBase synonyms
+  # -----------------------------
+  fb_syn <- tryCatch(synonyms(species), error = function(e) NULL)
+  candidate_names <- species
+  if(!is.null(fb_syn) && nrow(fb_syn) > 0){
+    candidate_names <- unique(c(fb_syn$Species, fb_syn$Synonym))
+    candidate_names <- candidate_names[!is.na(candidate_names)]
+  }
+
+  # -----------------------------
+  # 3. Try all FishBase names in AquaMaps
+  # -----------------------------
+  for(nm in candidate_names){
+    out <- try_aquamaps(nm)
+    if(!is.null(out)){
+      return(data.frame(
+        input_name      = species,
+        matched_name    = out$name,
+        speciesKey      = out$key,
+        status          = "fishbase_synonym_corrected",
+        FAO_region      = NA_character_,
+        in_study_region = NA,
+        country         = NA_character_
+      ))
+    }
+  }
+
+  # -----------------------------
+  # 4. GBIF fallback
+  # -----------------------------
+  gbif_match <- tryCatch(name_backbone(name = species), error = function(e) NULL)
+  if(!is.null(gbif_match) && !is.na(gbif_match$scientificName)){
+    out <- try_aquamaps(gbif_match$scientificName)
+    if(!is.null(out)){
+      return(data.frame(
+        input_name      = species,
+        matched_name    = out$name,
+        speciesKey      = out$key,
+        status          = "gbif_corrected",
+        FAO_region      = NA_character_,
+        in_study_region = NA,
+        country         = NA_character_
+      ))
+    }
+  }
+
+  # -----------------------------
+  # 5. FishBase FAO / country fallback
+  # -----------------------------
+  fao_info <- tryCatch(faoareas(species), error = function(e) NULL)
+  fao_region <- NA_character_
+  in_study_region <- NA
+  country_vec <- NA_character_
+
+  if(!is.null(fao_info) && nrow(fao_info) > 0 && "AreaCode" %in% colnames(fao_info)){
+    fao_region <- paste(fao_ref$AreaName[fao_ref$AreaCode %in% fao_info$AreaCode], collapse = "_")
+    in_study_region <- any(fao_info$AreaCode %in% study_region_codes)
+  } else {
+    fb_ctry <- tryCatch(country(species), error = function(e) NULL)
+    if(!is.null(fb_ctry) && nrow(fb_ctry) > 0 && "Country" %in% colnames(fb_ctry)){
+      countries <- unique(fb_ctry$Country)
+      countries <- countries[!is.na(countries)]
+      if(length(countries) > 0) country_vec <- paste(countries, collapse = "_")
+    }
+  }
+
+  return(data.frame(
+    input_name      = species,
+    matched_name    = species,
+    speciesKey      = NA,
+    status          = "fishbase_not_assessed",
+    FAO_region      = fao_region,
+    in_study_region = in_study_region,
+    country         = country_vec
+  ))
+}
 
 ############################################################
 # ---- 3. Iterative + checkpoint-safe loop ----
