@@ -1,4 +1,6 @@
-#R gbif functions
+############################################################
+# ---- GBIF data processing functions ----
+############################################################
 
 get_lat_stats <- function(species,
                           lim = 50000,
@@ -119,13 +121,10 @@ gbif_name <- function(Taxon.Name,Taxon.Level){
                       if(Taxon.Level == "species"){res <- name_backbone(name = Taxon.Name)}
                       if(Taxon.Level == "genus"){res <- name_backbone(genus = Taxon.Name)}
                       if(Taxon.Level == "family"){res <- name_backbone(family = Taxon.Name)}
-                      return(res$usageKey)
-                             }
-
-
+                      return(res$usageKey)}
 
 ############################################################
-# ---- 1. Get AquaMaps raster for species ----
+# ---- Get AquaMaps raster for species ----
 ############################################################
 
 get_aquamaps_cells <- function(species, bound_box = NULL){
@@ -203,9 +202,8 @@ get_aquamaps_raster <- function(species){
   return(ras)
 }
 
-
 ############################################################
-# ---- 2. Metrics ----
+# ---- Metrics ----
 ############################################################
 
 calc_weighted_lat <- function(df, prob_cutoff = 0){
@@ -248,11 +246,6 @@ calc_coastal_overlap <- function(df, coastal_sf, prob_cutoff = 0){
 ############################################################
 # ---- clean up taxonomy to link to aqumaps ----
 ############################################################
-
-library(rfishbase)
-library(rgbif)
-library(purrr)
-library(dplyr)
 
 resolve_aquamaps_species <- function(species, bound_box = NULL){
   library(terra)
@@ -470,13 +463,9 @@ resolve_species_vector <- function(species_vec, bound_box = NULL){
   return(species_table)
 }
 
-# Example usage:
-# problem_species <- c("Synodus myops", "Gadus morhua", "Trachinocephalus myops")
-# species_table <- resolve_species_vector(problem_species)
-# head(species_table)
 
 ############################################################
-# ---- 3. Iterative + checkpoint-safe loop ----
+# ---- Iterative + checkpoint-safe loop ----
 ############################################################
 
 run_aquamaps_analysis <- function(species_vec,

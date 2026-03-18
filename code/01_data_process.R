@@ -397,6 +397,19 @@ problem_species <- aquamaps_results%>%filter(is.na(weighted_lat)|is.na(q95_lat)|
 
 species_problem_table <- resolve_species_vector(problem_species)
 
+write.csv(species_problem_table,"output/problem_species_table.csv",row.names=FALSE)
+
+am_match_species <- species_problem_table%>%filter(status=="aquamaps_match")%>%pull(input_name)
+
+am_match_fao <- NULL
+for(i in am_match_species){
+
+  temp <- rfishbase::faoareas(i)%>%data.frame()%>%dplyr::select(AreaCode)
+
+  if(length(tryCatch(intersect(c(21,31),temp$AreaCode), error = function(e) NULL))==0){am_match_fao=c(am_match_fao,FALSE)}else{am_match_fao=c(am_match_fao,TRUE)}
+
+}
+
 ############################################################
 # ---- Knit it all together  ----
 ############################################################
