@@ -1,0 +1,96 @@
+"species","checked","match","matched_name","speciesKey","status","FAO_region","in_study_region","country"
+"Peprilus triacanthus","Peprilus triacanthus",TRUE,"Peprilus triacanthus",NA,"aquamaps_no_raster","Atlantic, Northwest_Atlantic, Western Central",TRUE,NA
+"Typhlonarke aysoni","Typhlonarke aysoni",TRUE,"Typhlonarke aysoni","Fis-115469","aquamaps_outside_bbox","Pacific, Southwest",FALSE,NA
+"Mobula rochebrunei","Mobula hypostoma",FALSE,"Mobula hypostoma","Fis-24125","fishbase_synonym_corrected",NA,NA,NA
+"Oncorhynchus mykiss","Oncorhynchus mykiss",TRUE,"Oncorhynchus mykiss","Fis-22919","aquamaps_outside_bbox","Arctic Sea_Atlantic, Northwest_Atlantic, Northeast_Mediterranean and Black Sea_Indian Ocean, Western_Indian Ocean, Eastern_Pacific, Northwest_Pacific, Northeast_Pacific, Western Central_Pacific, Eastern Central_Pacific, Southwest",TRUE,NA
+"Oncorhynchus tshawytscha","Oncorhynchus tshawytscha",TRUE,"Oncorhynchus tshawytscha","Fis-22921","aquamaps_outside_bbox","Arctic Sea_Pacific, Northwest_Pacific, Northeast_Pacific, Eastern Central_Pacific, Southwest",FALSE,NA
+"Gadus macrocephalus","Gadus macrocephalus",TRUE,"Gadus macrocephalus","Fis-29393","aquamaps_outside_bbox","Arctic Sea_Atlantic, Northwest_Atlantic, Northeast_Pacific, Northwest_Pacific, Northeast_Pacific, Eastern Central",TRUE,NA
+"Limanda punctatissima","Myzopsetta punctatissima",FALSE,"Limanda punctatissima",NA,"fishbase_not_assessed",NA,NA,NA
+"Parophrys vetulus","Parophrys vetulus",TRUE,"Parophrys vetulus","Fis-30858","aquamaps_outside_bbox","Pacific, Northwest_Pacific, Northeast_Pacific, Eastern Central",FALSE,NA
+"Dicentrarchus labrax","Dicentrarchus labrax",TRUE,"Dicentrarchus labrax","Fis-22755","aquamaps_outside_bbox","Atlantic, Northeast_Atlantic, Eastern Central_Mediterranean and Black Sea",FALSE,NA
+"Tenualosa reevesii","Tenualosa reevesii",TRUE,"Tenualosa reevesii",NA,"aquamaps_no_raster","Indian Ocean, Eastern_Pacific, Northwest",FALSE,NA
+"Strangomera bentincki","Strangomera bentincki",TRUE,"Strangomera bentincki",NA,"aquamaps_no_raster","Atlantic, Southwest_Pacific, Southeast",FALSE,NA
+"Ammodytes personatus","Ammodytes personatus",TRUE,"Ammodytes personatus","Fis-29268","aquamaps_outside_bbox","Pacific, Northwest_Pacific, Northeast",FALSE,NA
+"Kareius bicoloratus","Platichthys bicoloratus",FALSE,"Kareius bicoloratus",NA,"fishbase_not_assessed",NA,NA,NA
+"Oncorhynchus clarkii","Oncorhynchus clarkii",TRUE,"Oncorhynchus clarkii","Fis-156254","aquamaps_outside_bbox","Pacific, Northeast_Pacific, Eastern Central",FALSE,NA
+"Pleuronichthys cornutus","Pleuronichthys cornutus",TRUE,"Pleuronichthys cornutus","Fis-27050","aquamaps_outside_bbox","Pacific, Northwest",FALSE,NA
+"Liopsetta glacialis","Liopsetta glacialis",TRUE,"Liopsetta glacialis","Fis-24741","aquamaps_outside_bbox","Arctic Sea_Atlantic, Northwest_Atlantic, Northeast_Pacific, Northwest_Pacific, Northeast",TRUE,NA
+"Engraulis ringens","Engraulis ringens",TRUE,"Engraulis ringens","Fis-29372","aquamaps_outside_bbox","Pacific, Southeast",FALSE,NA
+"Cryptacanthodes giganteus","Cryptacanthodes giganteus",TRUE,"Cryptacanthodes giganteus","Fis-132060","aquamaps_outside_bbox","Arctic Sea_Pacific, Northeast_Pacific, Eastern Central",FALSE,NA
+"Malacoraja kreffti","Malacoraja kreffti",TRUE,"Malacoraja kreffti",NA,"aquamaps_no_raster","Atlantic, Northeast",FALSE,NA
+"Clupea pallasii","Clupea pallasii",TRUE,"Clupea pallasii","Fis-153539","aquamaps_outside_bbox","Arctic Sea_Atlantic, Northeast_Pacific, Northwest_Pacific, Northeast_Pacific, Eastern Central",FALSE,NA
+"Lycodes nakamurae","Lycodes nakamurae",TRUE,"Lycodes nakamurae","Fis-116597","aquamaps_outside_bbox","Pacific, Northwest",FALSE,NA
+"Myoxocephalus ochotensis","Myoxocephalus ochotensis",TRUE,"Myoxocephalus ochotensis",NA,"aquamaps_no_raster","Pacific, Northwest",FALSE,NA
+"Myoxocephalus brandtii","Myoxocephalus brandtii",TRUE,"Myoxocephalus brandtii","Fis-150531","aquamaps_outside_bbox","Pacific, Northwest",FALSE,NA
+"Myoxocephalus jaok","Myoxocephalus jaok",TRUE,"Myoxocephalus jaok",NA,"aquamaps_no_raster","Arctic Sea_Pacific, Northwest_Pacific, Northeast",FALSE,NA
+"Myoxocephalus polyacanthocephalus","Myoxocephalus polyacanthocephalus",TRUE,"Myoxocephalus polyacanthocephalus","Fis-24808","aquamaps_outside_bbox","Pacific, Northwest_Pacific, Northeast",FALSE,NA
+"Gymnocanthus intermedius","Gymnocanthus intermedius",TRUE,"Gymnocanthus intermedius","Fis-54627","aquamaps_outside_bbox","Pacific, Northwest",FALSE,NA
+"Gymnocanthus galeatus","Gymnocanthus galeatus",TRUE,"Gymnocanthus galeatus","Fis-24652","aquamaps_match","Pacific, Northwest_Pacific, Northeast",FALSE,NA
+"Gymnocanthus herzensteini","Gymnocanthus herzensteini",TRUE,"Gymnocanthus herzensteini","Fis-54625","aquamaps_outside_bbox","Pacific, Northwest",FALSE,NA
+"Cottus asper","Cottus asper",TRUE,"Cottus asper",NA,"aquamaps_no_raster","",FALSE,NA
+"Argyrocottus zanderi","Argyrocottus zanderi",TRUE,"Argyrocottus zanderi","Fis-54612","aquamaps_outside_bbox","Pacific, Northwest",FALSE,NA
+"Hemitripterus villosus","Hemitripterus villosus",TRUE,"Hemitripterus villosus","Fis-28186","aquamaps_outside_bbox","Pacific, Northwest_Pacific, Northeast",FALSE,NA
+"Sebastes koreanus","Sebastes koreanus",TRUE,"Sebastes koreanus",NA,"aquamaps_no_raster","Pacific, Northwest",FALSE,NA
+"Salvelinus curilus","Salvelinus curilus",TRUE,"Salvelinus curilus",NA,"aquamaps_no_raster","Pacific, Northwest",FALSE,NA
+"Thunnus tonggol","Thunnus tonggol",TRUE,"Thunnus tonggol","Fis-22838","aquamaps_outside_bbox","Indian Ocean, Western_Indian Ocean, Eastern_Pacific, Northwest_Pacific, Western Central_Pacific, Southwest",FALSE,NA
+"Thunnus maccoyii","Thunnus maccoyii",TRUE,"Thunnus maccoyii","Fis-22835","aquamaps_outside_bbox","Atlantic, Southwest_Atlantic, Southeast_Atlantic, Antarctic_Indian Ocean, Western_Indian Ocean, Eastern_Indian Ocean, Antarctic and Southern_Pacific, Southwest_Pacific, Southeast",FALSE,NA
+"Zoarces andriashevi","Zoarces andriashevi",TRUE,"Zoarces andriashevi",NA,"aquamaps_no_raster","Pacific, Northwest",FALSE,NA
+"Acipenser sturio","Acipenser sturio",TRUE,"Acipenser sturio","Fis-29593","aquamaps_outside_bbox","Atlantic, Northeast_Atlantic, Eastern Central_Mediterranean and Black Sea",FALSE,NA
+"Paralichthys olivaceus","Paralichthys olivaceus",TRUE,"Paralichthys olivaceus","Fis-23711","aquamaps_outside_bbox","Pacific, Northwest_Pacific, Western Central",FALSE,NA
+"Psettichthys melanostictus","Psettichthys melanostictus",TRUE,"Psettichthys melanostictus","Fis-30880","aquamaps_outside_bbox","Pacific, Northwest_Pacific, Northeast_Pacific, Eastern Central",FALSE,NA
+"Pseudopleuronectes yokohamae","Pseudopleuronectes yokohamae",TRUE,"Pseudopleuronectes yokohamae",NA,"aquamaps_no_raster","Pacific, Northwest",FALSE,NA
+"Hippoglossoides elassodon","Hippoglossoides elassodon",TRUE,"Hippoglossoides elassodon","Fis-29417","aquamaps_outside_bbox","Pacific, Northwest_Pacific, Northeast_Pacific, Eastern Central",FALSE,NA
+"Isopsetta isolepis","Isopsetta isolepis",TRUE,"Isopsetta isolepis","Fis-24715","aquamaps_outside_bbox","Pacific, Northwest_Pacific, Northeast_Pacific, Eastern Central",FALSE,NA
+"Eopsetta grigorjewi","Eopsetta grigorjewi",TRUE,"Eopsetta grigorjewi","Fis-27196","aquamaps_outside_bbox","Pacific, Northwest",FALSE,NA
+"Liopsetta pinnifasciata","Liopsetta pinnifasciata",TRUE,"Liopsetta pinnifasciata",NA,"aquamaps_no_raster","Pacific, Northwest",FALSE,NA
+"Platichthys stellatus","Platichthys stellatus",TRUE,"Platichthys stellatus","Fis-24899","aquamaps_outside_bbox","Arctic Sea_Pacific, Northwest_Pacific, Northeast_Pacific, Eastern Central",FALSE,NA
+"Platichthys flesus","Platichthys flesus",TRUE,"Platichthys flesus","Fis-23725","aquamaps_outside_bbox","Arctic Sea_Atlantic, Northeast_Atlantic, Eastern Central_Mediterranean and Black Sea",FALSE,NA
+"Sardinops sagax","Sardinops sagax",TRUE,"Sardinops sagax","Fis-54081","aquamaps_outside_bbox","Atlantic, Southeast_Indian Ocean, Western_Indian Ocean, Eastern_Pacific, Northwest_Pacific, Northeast_Pacific, Western Central_Pacific, Eastern Central_Pacific, Southwest_Pacific, Southeast",FALSE,NA
+"Alosa alabamae","Alosa alabamae",TRUE,"Alosa alabamae",NA,"aquamaps_no_raster","Atlantic, Western Central",TRUE,NA
+"Alosa fallax","Alosa fallax",TRUE,"Alosa fallax","Fis-25577","aquamaps_outside_bbox","Atlantic, Northeast_Atlantic, Eastern Central_Mediterranean and Black Sea",FALSE,NA
+"Alosa alosa","Alosa alosa",TRUE,"Alosa immaculata","Fis-2","aquamaps_outside_bbox","Atlantic, Northeast_Atlantic, Eastern Central_Mediterranean and Black Sea",FALSE,NA
+"Sprattus muelleri","Sprattus antipodum",FALSE,"Sprattus muelleri","Fis-23832","aquamaps_outside_bbox","Pacific, Southwest",FALSE,NA
+"Gadus chalcogrammus","Gadus chalcogrammus",TRUE,"Gadus chalcogrammus","Fis-1918","aquamaps_outside_bbox","Arctic Sea_Pacific, Northwest_Pacific, Northeast_Pacific, Eastern Central",FALSE,NA
+"Merlangius merlangus","Merlangius merlangus",TRUE,"Merlangius merlangus","Fis-22726","aquamaps_outside_bbox","Atlantic, Northeast_Mediterranean and Black Sea",FALSE,NA
+"Plecoglossus altivelis","Plecoglossus altivelis",TRUE,"Plecoglossus altivelis","Fis-29478","aquamaps_outside_bbox","Pacific, Northwest",FALSE,NA
+"Salvelinus malma","Salvelinus malma",TRUE,"Salvelinus malma","Fis-24332","aquamaps_outside_bbox","Arctic Sea_Pacific, Northwest_Pacific, Northeast",FALSE,NA
+"Liparis miostomus","Liparis miostomus",TRUE,"Liparis miostomus",NA,"aquamaps_no_raster","Pacific, Northwest",FALSE,NA
+"Oncorhynchus nerka","Oncorhynchus nerka",TRUE,"Oncorhynchus nerka","Fis-22920","aquamaps_outside_bbox","Arctic Sea_Indian Ocean, Western_Pacific, Northwest_Pacific, Northeast_Pacific, Eastern Central",FALSE,NA
+"Pungitius sinensis","Pungitius sinensis",TRUE,"Pungitius sinensis",NA,"aquamaps_no_raster","Pacific, Northwest",FALSE,NA
+"Lycodes toyamensis","Lycodes toyamensis",TRUE,"Lycodes toyamensis",NA,"aquamaps_no_raster","Pacific, Northwest",FALSE,NA
+"Lycodes tanakae","Lycodes tanakae",TRUE,"Lycodes tanakae","Fis-54435","aquamaps_outside_bbox","Pacific, Northwest",FALSE,NA
+"Pholis nebulosa","Pholis nebulosa",TRUE,"Pholis nebulosa","Fis-150108","aquamaps_outside_bbox","Pacific, Northwest",FALSE,NA
+"Pholis crassispina","Pholis crassispina",TRUE,"Pholis crassispina","Fis-150107","aquamaps_outside_bbox","Pacific, Northwest",FALSE,NA
+"Lepidopsetta mochigarei","Lepidopsetta mochigarei",TRUE,"Lepidopsetta mochigarei","Fis-33024","aquamaps_outside_bbox","Pacific, Northwest",FALSE,NA
+"Lepidopsetta polyxystra","Lepidopsetta polyxystra",TRUE,"Lepidopsetta polyxystra","Fis-144053","aquamaps_outside_bbox","Pacific, Northwest_Pacific, Northeast",FALSE,NA
+"Limanda aspera","Limanda aspera",TRUE,"Limanda aspera","Fis-11256","aquamaps_outside_bbox","Arctic Sea_Pacific, Northwest_Pacific, Northeast",FALSE,NA
+"Limanda proboscidea","Myzopsetta proboscidea",FALSE,"Limanda proboscidea","Fis-17283","aquamaps_outside_bbox",NA,NA,NA
+"Anguilla bicolor","Anguilla bicolor",TRUE,"Anguilla bicolor","Fis-8951","aquamaps_outside_bbox","Indian Ocean, Western_Indian Ocean, Eastern_Pacific, Northwest_Pacific, Western Central",FALSE,NA
+"Pleuronectes platessa","Pleuronectes platessa",TRUE,"Pleuronectes platessa","Fis-30498","aquamaps_match","Arctic Sea_Atlantic, Northwest_Atlantic, Northeast_Atlantic, Eastern Central_Mediterranean and Black Sea",TRUE,NA
+"Argentina silus","Glossanodon leioglossus",FALSE,"Glossanodon leioglossus","Fis-23510","fishbase_synonym_corrected","Atlantic, Northwest_Atlantic, Northeast",TRUE,NA
+"Ammodytes tobianus","Ammodytes tobianus",TRUE,"Ammodytes tobianus","Fis-29269","aquamaps_outside_bbox","Atlantic, Northeast",FALSE,NA
+"Argentina sialis","Argentina sialis",TRUE,"Argentina sialis","Fis-29667","aquamaps_outside_bbox","Pacific, Northeast_Pacific, Eastern Central",FALSE,NA
+"Blepsias cirrhosus","Blepsias cirrhosus",TRUE,"Blepsias cirrhosus","Fis-24467","aquamaps_outside_bbox","Pacific, Northwest_Pacific, Northeast_Pacific, Eastern Central",FALSE,NA
+"Capros aper","Capros aper",TRUE,"Capros aper","Fis-22743","aquamaps_outside_bbox","Atlantic, Northeast_Atlantic, Eastern Central_Mediterranean and Black Sea",FALSE,NA
+"Eumicrotremus terraenovae","Eumicrotremus spinosus",FALSE,"Eumicrotremus spinosus","Fis-24612","fishbase_synonym_corrected","Atlantic, Northwest",TRUE,NA
+"Fritillaria borealis",NA,NA,"Fritillaria borealis",NA,"fishbase_not_assessed",NA,NA,NA
+"Hexagrammos lagocephalus","Hexagrammos lagocephalus",TRUE,"Hexagrammos lagocephalus","Fis-24673","aquamaps_outside_bbox","Pacific, Northwest_Pacific, Northeast_Pacific, Eastern Central",FALSE,NA
+"Himantolophus groenlandicus","Himantolophus groenlandicus",TRUE,"Himantolophus groenlandicus",NA,"aquamaps_no_raster","Atlantic, Northwest_Atlantic, Northeast_Atlantic, Western Central_Atlantic, Eastern Central_Atlantic, Southeast_Indian Ocean, Western_Indian Ocean, Eastern_Pacific, Northwest_Pacific, Western Central_Pacific, Southeast",TRUE,NA
+"Howella sherborni","Howella sherborni",TRUE,"Howella sherborni","Fis-25433","aquamaps_outside_bbox","Atlantic, Southeast_Pacific, Southwest",FALSE,NA
+"Lampanyctus macdonaldi","Lampanyctus macdonaldi",TRUE,"Lampanyctus macdonaldi",NA,"aquamaps_no_raster","Atlantic, Northwest_Atlantic, Northeast_Atlantic, Southwest_Atlantic, Southeast_Atlantic, Antarctic_Indian Ocean, Western_Indian Ocean, Eastern_Indian Ocean, Antarctic and Southern_Pacific, Southwest_Pacific, Southeast_Pacific, Antarctic",TRUE,NA
+"Lepidopsetta bilineata","Lepidopsetta bilineata",TRUE,"Lepidopsetta bilineata","Fis-55090","aquamaps_outside_bbox","Pacific, Northwest_Pacific, Northeast_Pacific, Eastern Central",FALSE,NA
+"Liparis montagui","Liparis montagui",TRUE,"Liparis montagui","Fis-23599","aquamaps_outside_bbox","Atlantic, Northeast",FALSE,NA
+"Lophius piscatorius","Lophius piscatorius",TRUE,"Lophius piscatorius","Fis-29433","aquamaps_outside_bbox","Atlantic, Northwest_Atlantic, Northeast_Atlantic, Eastern Central_Mediterranean and Black Sea",TRUE,NA
+"Mancopsetta maculata","Mancopsetta maculata",TRUE,"Mancopsetta maculata","Fis-133769","aquamaps_outside_bbox","Atlantic, Southwest_Atlantic, Antarctic_Indian Ocean, Antarctic and Southern_Pacific, Southeast_Pacific, Antarctic",FALSE,NA
+"Notoscopelus elongatus","Notoscopelus elongatus",TRUE,"Notoscopelus elongatus","Fis-23196","aquamaps_outside_bbox","Mediterranean and Black Sea",FALSE,NA
+"Oncorhynchus kisutch","Oncorhynchus kisutch",TRUE,"Oncorhynchus kisutch","Fis-22917","aquamaps_outside_bbox","Arctic Sea_Atlantic, Northeast_Pacific, Northwest_Pacific, Northeast_Pacific, Eastern Central",FALSE,NA
+"Osmerus eperlanus","Osmerus eperlanus",TRUE,"Osmerus eperlanus","Fis-23705","aquamaps_outside_bbox","Atlantic, Northwest_Atlantic, Northeast_Pacific, Northeast",TRUE,NA
+"Pholis clemensi","Pholis clemensi",TRUE,"Pholis clemensi","Fis-30485","aquamaps_outside_bbox","Pacific, Northeast_Pacific, Eastern Central",FALSE,NA
+"Pholis ornata","Pholis ornata",TRUE,"Pholis ornata","Fis-24895","aquamaps_outside_bbox","Pacific, Northwest_Pacific, Northeast_Pacific, Eastern Central",FALSE,NA
+"Salmo trutta","Salmo trutta",TRUE,"Salmo trutta","Fis-21630","aquamaps_outside_bbox","Atlantic, Northwest_Atlantic, Northeast_Mediterranean and Black Sea_Pacific, Northeast",TRUE,NA
+"Sarda sarda","Sarda sarda",TRUE,"Sarda lineolata","Fis-1099","aquamaps_outside_bbox","Atlantic, Northwest_Atlantic, Northeast_Atlantic, Western Central_Atlantic, Eastern Central_Mediterranean and Black Sea_Atlantic, Southwest_Atlantic, Southeast_Indian Ocean, Western",TRUE,NA
+"Serranus scriba","Serranus cabrilla",FALSE,"Serranus scriba","Fis-23811","aquamaps_outside_bbox","Atlantic, Northeast_Atlantic, Eastern Central_Mediterranean and Black Sea",FALSE,NA
+"Siganus rivulatus","Siganus rivulatus",TRUE,"Siganus rivulatus","Fis-31011","aquamaps_outside_bbox","Mediterranean and Black Sea_Indian Ocean, Western",FALSE,NA
+"Synodus myops","Trachinocephalus myops",FALSE,"Trachinocephalus myops","Fis-24378","fishbase_synonym_corrected",NA,NA,NA
+"Trachinotus blochii","Trachinotus blochii",TRUE,"Trachinotus blochii","Fis-23862","aquamaps_outside_bbox","Indian Ocean, Western_Indian Ocean, Eastern_Pacific, Northwest_Pacific, Western Central_Pacific, Eastern Central_Pacific, Southwest",FALSE,NA
+"Vinciguerria nimbaria","Vinciguerria nimbaria",TRUE,"Vinciguerria nimbaria",NA,"aquamaps_no_raster","Atlantic, Northwest_Atlantic, Northeast_Atlantic, Western Central_Atlantic, Eastern Central_Atlantic, Southwest_Atlantic, Southeast_Indian Ocean, Western_Indian Ocean, Eastern_Pacific, Northwest_Pacific, Western Central_Pacific, Eastern Central_Pacific, Southwest_Pacific, Southeast",TRUE,NA
