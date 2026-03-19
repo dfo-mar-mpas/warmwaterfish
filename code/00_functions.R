@@ -247,10 +247,11 @@ calc_coastal_overlap <- function(df, coastal_sf, prob_cutoff = 0){
 # ---- clean up taxonomy to link to aqumaps ----
 ############################################################
 
-resolve_aquamaps_species <- function(species, bound_box = NULL){
+resolve_aquamaps_species <- function(species, bound_box = NULL, atlantic_vect = NULL){
   library(terra)
   library(sf)
   library(rfishbase)
+  library(rnaturalearth)
 
   # -----------------------------
   # Default Western Atlantic bounding box
@@ -260,7 +261,8 @@ resolve_aquamaps_species <- function(species, bound_box = NULL){
       xmin = -100, xmax = -40,
       ymin = 13,  ymax = 85
     ), crs = st_crs(4326))
-  }
+  } #note the southwestern corner of this box does include part of the pacific
+
 
   # -----------------------------
   # FAO reference table
@@ -309,6 +311,12 @@ resolve_aquamaps_species <- function(species, bound_box = NULL){
       ras <- terra::rast(ras) %>% terra::project("EPSG:4326")
       bb_vect <- bound_box %>% st_as_sfc() %>% terra::vect()
       ras_crop <- tryCatch(terra::crop(ras, bb_vect), error = function(e) NULL)
+
+      if (!is.null(ras_crop)) {
+        ras_mask <- tryCatch(terra::mask(ras_crop, atlantic_vect), error = function(e) NULL)
+      } else {
+        ras_mask <- NULL
+      }
 
       if(!is.null(ras_crop) && !is.na(sum(terra::values(ras_crop), na.rm = TRUE)) &&
          sum(terra::values(ras_crop), na.rm = TRUE) > 0){
@@ -391,7 +399,7 @@ resolve_aquamaps_species <- function(species, bound_box = NULL){
   # -----------------------------
   gbif_match <- tryCatch(name_backbone(name = species), error = function(e) NULL)
   if(!is.null(gbif_match) && !is.na(gbif_match$scientificName)){
-    out <- try_aquamaps(gbif_match$scientificName)
+    out <- try_aquamaps(sub("^((\\S+\\s+\\S+)).*", "\\1",gbif_match$scientificName)) #remove the taxonomic authority that gbif returns but is not used by aquamaps
     if(!is.null(out)){
       return(data.frame(
         input_name      = species,
@@ -425,18 +433,26 @@ resolve_aquamaps_species <- function(species, bound_box = NULL){
     }
   }
 
+  status2 <- if (is.na(fb_syn$Species[1])) {
+    "fishbase_not_assessed"
+  } else if (species == fb_syn$Species[1]) { #catch scenarios where the synonym is the same as species - this would be in aquamaps shows 'accepted' but no map produced
+    "aquamaps_no_raster"
+  } else {
+    "fishbase_not_assessed"
+  }
+
   return(data.frame(
     input_name      = species,
     matched_name    = species,
     speciesKey      = NA,
-    status          = "fishbase_not_assessed",
+    status          = status2,
     FAO_region      = fao_region,
     in_study_region = in_study_region,
     country         = country_vec
   ))
 }
 
-resolve_species_vector <- function(species_vec, bound_box = NULL){
+resolve_species_vector <- function(species_vec, bound_box = NULL, atlantic_vect = NULL){
 
   n <- length(species_vec)
   pb <- cli_progress_bar("Resolving species", total = n)
@@ -449,7 +465,7 @@ resolve_species_vector <- function(species_vec, bound_box = NULL){
     # Show which species is being processed
     message("Processing: ", sp)
 
-    res <- resolve_aquamaps_species(sp, bound_box = bound_box)
+    res <- resolve_aquamaps_species(sp, bound_box = bound_box, atlantic_vect=atlantic_vect)
     all_results[[i]] <- res
 
     # Update progress bar
@@ -463,6 +479,29 @@ resolve_species_vector <- function(species_vec, bound_box = NULL){
   return(species_table)
 }
 
+fishbase_syn_check <- function(species) {
+  fb_syn <- tryCatch(synonyms(species), error = function(e) NULL)
+
+  if (is.null(fb_syn) || nrow(fb_syn) == 0 || is.na(fb_syn$Species[1])) {
+    return(NA_character_)
+  }
+
+  fb_syn$Species[1]
+} #just a double check because this doesn't quite work right in resolve aquamaps species.
+
+aquamaps_check <- function(name){
+  res <- tryCatch(am_search_fuzzy(name), error = function(e) NULL)
+  if(!is.null(res) && nrow(res) > 0){
+    terms_str <- res$terms[1]
+    sci_name <- NA_character_
+    if(!is.na(terms_str)){
+      split_terms <- strsplit(terms_str, " ")[[1]]
+      if(length(split_terms) >= 2) sci_name <- paste(split_terms[1:2], collapse = " ")
+    }
+    return(data.frame(name = sci_name, key = res$key[1]))
+  }
+  return(data.frame(name=NA,key=NA))
+}
 
 ############################################################
 # ---- Iterative + checkpoint-safe loop ----
@@ -516,5 +555,50 @@ run_aquamaps_analysis <- function(species_vec,
 
   bind_rows(results)
 }
+
+
+############################################################
+# ---- Build an Atlantic mask ----
+############################################################
+
+# oceans <- ne_download(scale = 110, type = "geography_marine_polys", category = "physical", returnclass = "sf")
+# land <- ne_countries(scale = 110, returnclass = "sf") %>% st_transform(4326)
+#
+# pacific <- oceans %>%
+#   dplyr::filter(grepl("Pacific", name) )%>%
+#   st_transform(4326)%>%
+#   st_make_valid()%>%
+#   st_union()
+#
+# land_mask <- land %>%
+#   filter(admin %in% c(
+#     "Mexico", "Belize", "Guatemala", "Honduras",
+#     "El Salvador", "Nicaragua", "Costa Rica", "Panama"
+#   )) %>%
+#   st_union() %>%
+#   st_make_valid()
+#
+# bb_sf <- st_as_sfc(bound_box)
+#
+# atlantic_bb <- bb_sf %>%
+#   st_difference(pacific) %>%
+#   st_difference(land_mask) %>%
+#   st_make_valid()
+#
+# # Only keep largest contiguous part
+# atlantic_bb <- st_cast(atlantic_bb, "POLYGON")
+# atlantic_bb <- atlantic_bb[which.max(st_area(atlantic_bb)), ]
+# atlantic_bb <- st_buffer(atlantic_bb, 0)   # fix tiny topology issues
+#
+# #this process does create some boundary effects (particulary in the south)
+# south_fix <- bound_box
+# south_fix[1] <- -85
+# south_fix <- south_fix%>%st_as_sfc()
+#
+# atlantic_bb <- atlantic_bb%>%
+#                st_union(.,south_fix)%>%
+#                st_make_valid()
+#
+# write_sf(atlantic_bb,"data/Atlantic_bounding.shp")
 
 
