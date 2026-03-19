@@ -315,8 +315,6 @@ resolve_aquamaps_species <- function(species, bound_box = NULL, atlantic_vect = 
   # 1. Try original name in AquaMaps
   # -----------------------------
   out <- try_aquamaps(species)
-  fao_region <- NA_character_
-  in_study_region <- NA
 
   if(!is.null(out)){
     ras <- tryCatch(am_raster(out$key), error = function(e) NULL)

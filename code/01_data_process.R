@@ -477,7 +477,6 @@ problem_species <- aquamaps_results%>%filter(is.na(weighted_lat)|is.na(q95_lat)|
   }
 
   #"Gymnocanthus galeatus" = small amount of projected habitat in easter arctic, but not within FAO 21 or 31
-  #"Sardinops sagax" = small amount of pacific overlap in the southwestern corner of the crop box
   #"Pleuronectes platessa"= small amount of habitat around greenland
 
   am_match_species[am_match_fao] #which species are in the right FAO but are also near the region
