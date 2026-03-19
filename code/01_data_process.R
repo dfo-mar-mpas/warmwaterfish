@@ -382,7 +382,8 @@ missing_targets <- c(setdiff(warm_sp_manual%>%filter(Taxon.Level=="genus")%>%pul
                     )
 
   aquamaps_results <- read.csv("output/aquamaps_results.csv")%>%
-                      filter(species%in%species_stats$species)
+                      filter(species%in%species_stats$species)%>%
+                      mutate(matched_name=NA)#just a switch for those that are
 
 ############################################################
 # ---- key out problem species and fix them  ----
@@ -395,20 +396,92 @@ problem_species <- aquamaps_results%>%filter(is.na(weighted_lat)|is.na(q95_lat)|
     #2) if name is good, does aquamaps have a map for it
     #3) if yes to 1) and 2) where is the species based on the fishbase FAO region 21/31 being the study area and if no FAO is the 'country' recorded for that species
 
-species_problem_table <- resolve_species_vector(problem_species)
+  #set up a cropped Atlantic for the mask
+  bound_box <- st_bbox(c(
+    xmin = -100, xmax = -40,
+    ymin = 13,  ymax = 85
+  ), crs = st_crs(4326))
 
-write.csv(species_problem_table,"output/problem_species_table.csv",row.names=FALSE)
+  #load the atlantic mask - see 'Build an Atlantic mask' in code/00_functions.R for code to do this.
+  atlantic_bb <- read_sf("data/Atlantic_bounding.shp")st_transform(4326)
+  atlantic_vect <- terra::vect(atlantic_bb)
 
-am_match_species <- species_problem_table%>%filter(status=="aquamaps_match")%>%pull(input_name)
+  species_problem_table2 <- species_problem_table
 
-am_match_fao <- NULL
-for(i in am_match_species){
 
-  temp <- rfishbase::faoareas(i)%>%data.frame()%>%dplyr::select(AreaCode)
+  #run the analysis
+  species_problem_table <- resolve_species_vector(problem_species,bound_box = bound_box,atlantic_vect=atlantic_vect) #takes a while so saved below
 
-  if(length(tryCatch(intersect(c(21,31),temp$AreaCode), error = function(e) NULL))==0){am_match_fao=c(am_match_fao,FALSE)}else{am_match_fao=c(am_match_fao,TRUE)}
+  #save outputs
+  write.csv(species_problem_table,"output/problem_species_table.csv",row.names=FALSE) #save progress
 
-}
+#first check for synonyms that might work on fishbase
+
+    #find synonyms
+    lookup <- data.frame(
+      species = problem_species,
+      checked = map_chr(problem_species, fishbase_syn_check)
+    )
+
+    lookup <- lookup%>%
+              mutate(match=species==checked)%>%
+              left_join(.,species_problem_table%>%rename(species=input_name))
+
+    syn_species <- lookup%>%filter(!match)
+
+    #check if they are in aquamaps
+    matched_sp <- NULL
+    for(i in 1:nrow(syn_species)){
+
+      out <- cbind(syn_species[i,"species"],aquamaps_check(syn_species$checked[i]))%>%
+             rename(species=1)
+
+      matched_sp <- rbind(matched_sp,out)
+
+    }
+
+    #re-run for the new synonyms
+
+    syn_species2 <- matched_sp%>%filter(!is.na(name))%>%pull(name)
+
+    aquamaps_process2 <- run_aquamaps_analysis(
+                        species_vec = syn_species2,
+                        coastal_sf = coastal_sf,
+                        prob_cutoff = threshold,
+                        save_file="output/aquamaps_results.csv" #this checks to see if it has already been done
+                        )
+
+    aquamaps_results2 <- read.csv("output/aquamaps_results.csv")%>%
+                         filter(species %in% syn_species2,!is.na(weighted_lat))%>%
+                         rename(matched_name=species)%>%
+                         left_join(.,lookup%>%dplyr::select(species,matched_name))%>%
+                         dplyr::select(names(aquamaps_results))
+
+    aquamaps_results_updated <- aquamaps_results%>%
+                                filter(!species %in% aquamaps_results2$species)%>%
+                                bind_rows(aquamaps_results2)
+
+
+
+#status == "aquamaps_match"
+  #check species that passed the test but this may be due to very low overlap or erroneous distributions
+  am_match_species <- species_problem_table%>%filter(status=="aquamaps_match")%>%pull(input_name)
+
+  am_match_fao <- NULL
+  for(i in am_match_species){
+
+    temp <- rfishbase::faoareas(i)%>%data.frame()%>%dplyr::select(AreaCode)
+
+    if(length(tryCatch(intersect(c(21,31),temp$AreaCode), error = function(e) NULL))==0){am_match_fao=c(am_match_fao,FALSE)}else{am_match_fao=c(am_match_fao,TRUE)}
+
+  }
+
+  #"Gymnocanthus galeatus" = small amount of projected habitat in easter arctic, but not within FAO 21 or 31
+  #"Sardinops sagax" = small amount of pacific overlap in the southwestern corner of the crop box
+  #"Pleuronectes platessa"= small amount of habitat around greenland
+
+  am_match_species[am_match_fao] #which species are in the right FAO but are also near the region
+
 
 ############################################################
 # ---- Knit it all together  ----

@@ -297,6 +297,20 @@ resolve_aquamaps_species <- function(species, bound_box = NULL, atlantic_vect = 
     return(NULL)
   }
 
+  #do the FAO check - fishbase 3rd way to match to the region
+  fao_info <- tryCatch(faoareas(species), error = function(e) NULL)%>%suppressMessages()
+
+  if(!is.null(fao_info) && nrow(fao_info) > 0 && "AreaCode" %in% colnames(fao_info)){
+
+    fao_region <- paste(fao_ref$AreaName[fao_ref$AreaCode %in% fao_info$AreaCode], collapse = "_")
+    in_study_region <- any(fao_info$AreaCode %in% study_region_codes)
+
+  } else {
+    fao_region <- NA_character_
+    in_study_region = NA
+
+  }
+
   # -----------------------------
   # 1. Try original name in AquaMaps
   # -----------------------------
@@ -318,26 +332,20 @@ resolve_aquamaps_species <- function(species, bound_box = NULL, atlantic_vect = 
         ras_mask <- NULL
       }
 
-      if(!is.null(ras_crop) && !is.na(sum(terra::values(ras_crop), na.rm = TRUE)) &&
-         sum(terra::values(ras_crop), na.rm = TRUE) > 0){
+      if(!is.null(ras_crop) && !is.na(sum(terra::values(ras_mask), na.rm = TRUE)) &&
+         sum(terra::values(ras_mask), na.rm = TRUE) > 0){
         # Raster intersects bbox → success
         return(data.frame(
           input_name      = species,
           matched_name    = out$name,
           speciesKey      = out$key,
           status          = "aquamaps_match",
-          FAO_region      = NA_character_,
-          in_study_region = NA,
+          FAO_region      = fao_region,
+          in_study_region = in_study_region,
           country         = NA_character_
         ))
       } else {
-        # Raster exists but outside bbox → check FAO
-        fao_info <- tryCatch(faoareas(species), error = function(e) NULL)
-        if(!is.null(fao_info) && nrow(fao_info) > 0 && "AreaCode" %in% colnames(fao_info)){
-          fao_region <- paste(fao_ref$AreaName[fao_ref$AreaCode %in% fao_info$AreaCode], collapse = "_")
-          in_study_region <- any(fao_info$AreaCode %in% study_region_codes)
-        }
-        return(data.frame(
+          return(data.frame(
           input_name      = species,
           matched_name    = out$name,
           speciesKey      = out$key,
@@ -349,11 +357,7 @@ resolve_aquamaps_species <- function(species, bound_box = NULL, atlantic_vect = 
       }
     } else {
       # No raster → check FAO
-      fao_info <- tryCatch(faoareas(species), error = function(e) NULL)
-      if(!is.null(fao_info) && nrow(fao_info) > 0 && "AreaCode" %in% colnames(fao_info)){
-        fao_region <- paste(fao_ref$AreaName[fao_ref$AreaCode %in% fao_info$AreaCode], collapse = "_")
-        in_study_region <- any(fao_info$AreaCode %in% study_region_codes)
-      }
+
       return(data.frame(
         input_name      = species,
         matched_name    = out$name,
@@ -387,8 +391,8 @@ resolve_aquamaps_species <- function(species, bound_box = NULL, atlantic_vect = 
         matched_name    = out$name,
         speciesKey      = out$key,
         status          = "fishbase_synonym_corrected",
-        FAO_region      = NA_character_,
-        in_study_region = NA,
+        FAO_region      = fao_region,
+        in_study_region = in_study_region,
         country         = NA_character_
       ))
     }
@@ -406,8 +410,8 @@ resolve_aquamaps_species <- function(species, bound_box = NULL, atlantic_vect = 
         matched_name    = out$name,
         speciesKey      = out$key,
         status          = "gbif_corrected",
-        FAO_region      = NA_character_,
-        in_study_region = NA,
+        FAO_region      = fao_region,
+        in_study_region = in_study_region,
         country         = NA_character_
       ))
     }
