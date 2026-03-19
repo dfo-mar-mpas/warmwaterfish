@@ -533,7 +533,6 @@ problem_species <- aquamaps_results%>%filter(is.na(weighted_lat)|is.na(q95_lat)|
                                       warm_flag == "tropical" & warm_flag_am == "tropical" ~ TRUE,
                                       TRUE ~ FALSE))%>%
                filter(keep)%>%
-               dplyr::select(species)%>%
                distinct(species,.keep_all=TRUE)
 
 
