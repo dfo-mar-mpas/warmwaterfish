@@ -339,8 +339,9 @@ resolve_aquamaps_species <- function(species, bound_box = NULL, atlantic_vect = 
           speciesKey      = out$key,
           status          = "aquamaps_match",
           FAO_region      = fao_region,
-          in_study_region = in_study_region,
-          country         = NA_character_
+          in_study_region = TRUE,
+          country         = NA_character_,
+          overlaps        = TRUE
         ))
       } else {
           return(data.frame(
@@ -350,7 +351,8 @@ resolve_aquamaps_species <- function(species, bound_box = NULL, atlantic_vect = 
           status          = "aquamaps_outside_bbox",
           FAO_region      = fao_region,
           in_study_region = in_study_region,
-          country         = NA_character_
+          country         = NA_character_,
+          overlaps        = FALSE
         ))
       }
     } else {
@@ -363,7 +365,9 @@ resolve_aquamaps_species <- function(species, bound_box = NULL, atlantic_vect = 
         status          = "aquamaps_no_raster",
         FAO_region      = fao_region,
         in_study_region = in_study_region,
-        country         = NA_character_
+        country         = NA_character_,
+        overlaps        = NA
+
       ))
     }
   }
@@ -391,7 +395,8 @@ resolve_aquamaps_species <- function(species, bound_box = NULL, atlantic_vect = 
         status          = "fishbase_synonym_corrected",
         FAO_region      = fao_region,
         in_study_region = in_study_region,
-        country         = NA_character_
+        country         = NA_character_,
+        overlaps        = NA
       ))
     }
   }
@@ -410,7 +415,8 @@ resolve_aquamaps_species <- function(species, bound_box = NULL, atlantic_vect = 
         status          = "gbif_corrected",
         FAO_region      = fao_region,
         in_study_region = in_study_region,
-        country         = NA_character_
+        country         = NA_character_,
+        overlaps        = NA
       ))
     }
   }
@@ -450,7 +456,8 @@ resolve_aquamaps_species <- function(species, bound_box = NULL, atlantic_vect = 
     status          = status2,
     FAO_region      = fao_region,
     in_study_region = in_study_region,
-    country         = country_vec
+    country         = country_vec,
+    overlaps        = NA
   ))
 }
 

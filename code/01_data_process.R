@@ -1,4 +1,8 @@
-#gbif credentials -----
+##########################################################################################
+# ---- 01_data_process identify warm water species from gbif pull for study region  ----
+##########################################################################################
+
+#set gbif credentials -----
 Sys.setenv(
   GBIF_USER = "rystanley",
   GBIF_PWD  = "Homarus23",
@@ -24,7 +28,7 @@ utm <- "+proj=utm +zone=20 +datum=NAD83 +units=km +no_defs +ellps=GRS80 +towgs84
 CanProj <- "+proj=lcc +lat_1=49 +lat_2=77 +lat_0=63.390675 +lon_0=-91.86666666666666 +x_0=6200000 +y_0=3000000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
 
 ############################################################
-# ---- 0. Load data  ----
+# ---- Load data  ----
 ############################################################
 dir("_targets/objects/")
 
@@ -32,16 +36,18 @@ dir("_targets/objects/")
   maritimes_sf <- tar_read(maritimes)
   coastal_sf <- tar_read(coastalmar)
 
+  #load gbif pull for the study region
   gbif_marine_data <- tar_read(gbifdataall)
 
   gbif_flat <- gbif_marine_data%>%
     st_drop_geometry
 
   #clean ws
-  rm(gbif_marine_data);gc()
+  rm(gbif_marine_data)
+  gc()
 
 ############################################################
-# ---- 1. identify probable warm water species based on observation frequency ----
+# ---- identify probable warm water species based on observation frequency in coastal area ----
 ############################################################
 
   warm_sp_manual <- read.csv("data/GBIF_keys.csv")%>%
@@ -58,6 +64,8 @@ dir("_targets/objects/")
 #identify rare species
 # -------------------
 
+  rare_tresh <- 30 #set this as a distinguising count for 'rare' occurences - presuming that warm water species are observed more infrequently
+
   gbif_filtered <- gbif_flat %>%
     filter(phylum == "Chordata",
            !class %in% c("Myxini","Petromyzonti","Aves","Ascidiacea",
@@ -67,7 +75,7 @@ dir("_targets/objects/")
 
 raresp1 <-  gbif_filtered %>%  #This is a misnomer from the pull antarctic species that was mis assigned to the region
           count(speciesKey, sort = TRUE)%>%
-          filter(n<=30, #30 record threshold
+          filter(n<=rare_tresh,
                 !is.na(speciesKey))%>%
           left_join(gbif_flat%>%
                       distinct(speciesKey,.keep_all=TRUE)%>%
@@ -137,7 +145,13 @@ missing_targets <- c(
                                count(speciesKey, sort = TRUE)%>%
                                dplyr::select(speciesKey,n))
 
-#map out the study range------
+############################################################
+# ---- Map of the study area  ----
+############################################################
+
+    #for rgbif note a range to acruire data. In this case the Northwest Atlantic (Caribean to Arctic) to assess 'climate migrants'
+    filter_range <- st_bbox(c(xmin = -100, xmax = -40, ymin = 13, ymax = 85), crs = 4326)
+
 
     basemap <- rbind(ne_states(country = "Canada",returnclass = "sf")%>%
                        dplyr::select(name_en,geometry)%>%
@@ -154,8 +168,6 @@ missing_targets <- c(
                        st_as_sf()%>%
                        mutate(country="USA"))
 
-    #for rgbif note a range to acruire data. In this case the Northwest Atlantic (Caribean to Arctic) to assess 'climate migrants'
-    filter_range <- st_bbox(c(xmin = -100, xmax = -40, ymin = 13, ymax = 85), crs = 4326)
 
     #create a projection for a spherical map
     center_pt <- filter_range%>%
@@ -257,7 +269,7 @@ missing_targets <- c(
       trim_img_ws("output/mapping_region.png") #helps with the need to finagle the dimensions above
 
 ############################################################
-# ---- 1. Download GBIF data for rare species ----
+# ---- Download GBIF data for rare species ----
 ############################################################
 
       #set bounding box
@@ -265,100 +277,102 @@ missing_targets <- c(
         st_as_sfc() |>
         st_as_text()
 
-      #download all of it together
-      # #establish download key with gbif
-      download_key <- occ_download(
-        pred_within(bbox), #for the box mapped above
-        pred("hasCoordinate", TRUE),
-        pred("hasGeospatialIssue", FALSE),
-        pred_in("speciesKey", c(raresp,medsp1)), #this is only for the records specified above
-        format = "SIMPLE_CSV",
-        user = Sys.getenv("GBIF_USER"),
-        pwd = Sys.getenv("GBIF_PWD"),
-        email = Sys.getenv("GBIF_EMAIL")
-      )
-
-      # check status of download key
-      occ_download_meta(download_key)
+      # #set up gbif download
+      # download_key <- occ_download(
+      #   pred_within(bbox), #for the box mapped above
+      #   pred("hasCoordinate", TRUE),
+      #   pred("hasGeospatialIssue", FALSE),
+      #   pred_in("speciesKey", c(raresp,medsp1)), #this is only for the records specified above
+      #   format = "SIMPLE_CSV",
+      #   user = Sys.getenv("GBIF_USER"),
+      #   pwd = Sys.getenv("GBIF_PWD"),
+      #   email = Sys.getenv("GBIF_EMAIL")
+      # )
+      #
+      # # check status of download key
+      # occ_download_meta(download_key)
 
       # when status == "SUCCEEDED"
-      dat <- occ_download_get(download_key, path = "data/gbif_download", overwrite = FALSE)
-      save(dat,file="data/gbif_dat_get_all.RData")
+      #dat <- occ_download_get(download_key, path = "data/gbif_download", overwrite = FALSE)
+      #save(dat,file="data/gbif_dat_get_all.RData")
 
-#load the download
-# import as data frame
-load("data/gbif_dat_get_all.RData")
-gbif_df <- occ_download_import(dat)
+      #load the download
+      # import as data frame
+      load("data/gbif_dat_get_all.RData")
+      gbif_df <- occ_download_import(dat)
 
-#missing one species
-sennet <- (rgbif::occ_data(
-  scientificName = "Sphyraena borealis",
-  hasCoordinate = TRUE,
-  limit = 50000,
-  decimalLongitude = "-100,-10"  # Western Atlantic filter only
-    )$data)%>%
-  mutate(class="Teleostei")
+      #missing one species
+      sennet <- (rgbif::occ_data(
+        scientificName = "Sphyraena borealis",
+        hasCoordinate = TRUE,
+        limit = 50000,
+        decimalLongitude = "-100,-10"  # Western Atlantic filter only
+          )$data)%>%
+        mutate(class="Teleostei")
 
-sennet <- sennet%>%
-         dplyr::select(intersect(names(gbif_df),names(sennet)))
+      sennet <- sennet%>%
+               dplyr::select(intersect(names(gbif_df),names(sennet)))
 
-gbif_df <- gbif_df%>%
-           dplyr::select(intersect(names(gbif_df),names(sennet)))%>%
-           rbind(.,sennet)
+      #add sennet (aka baracuda to the dataset)
+      gbif_df <- gbif_df%>%
+                 dplyr::select(intersect(names(gbif_df),names(sennet)))%>%
+                 rbind(.,sennet)
 
 
-#compute summary stats for each species
-species_stats <- gbif_df %>%
-  filter(phylum == "Chordata",
-         !class %in% c("Myxini","Petromyzonti","Aves","Ascidiacea",
-                       "Mammalia","Thaliacea","Testudines","Squamata"),#just keep sharks and fish. for some reason fish do not have a consistent class
-         species != "Lycodichthys dearborni",
-         occurrenceStatus == "PRESENT")%>%
-  group_by(species) %>%
-  summarise(
-    n = n(),
-    q95 = quantile(decimalLatitude, 0.95, na.rm=TRUE),
-    q99 = quantile(decimalLatitude, 0.99, na.rm=TRUE),
-    median_lat = median(decimalLatitude,na.rm=TRUE),
-    mean_lat = median(decimalLongitude,na.rm=T)
-  )%>%
-  mutate(
-    warm_flag = case_when(
-      q95 < 38 ~ "tropical",
-      q95 < 41 ~ "southern_range_edge",
-      q95 < 43.2 ~ "possible_warm_water",
-      TRUE ~ "northern_species"
-    )
-  )%>%
-  left_join(.,gbif_df%>%
-              distinct(species,.keep_all=TRUE)%>%
-              dplyr::select(kingdom,phylum,class,order,genus,family,species,speciesKey))%>%
-  left_join(.,data.frame(rbind(data.frame(speciesKey=raresp,selection="rare"),
-                               data.frame(speciesKey=medsp1,selection="less than 2000 obs"))))
+#####################################################################################################################################
+# ---- Compute summary stats and assign classification to species search from their distribution in gbif within NW atlantic ----
+#####################################################################################################################################
+      species_stats <- gbif_df %>%
+        filter(phylum == "Chordata",
+               !class %in% c("Myxini","Petromyzonti","Aves","Ascidiacea",
+                             "Mammalia","Thaliacea","Testudines","Squamata"),#just keep sharks and fish. for some reason fish do not have a consistent class
+               species != "Lycodichthys dearborni",
+               occurrenceStatus == "PRESENT")%>%
+        group_by(species) %>%
+        summarise(
+          n = n(),
+          q95 = quantile(decimalLatitude, 0.95, na.rm=TRUE),
+          q99 = quantile(decimalLatitude, 0.99, na.rm=TRUE),
+          median_lat = median(decimalLatitude,na.rm=TRUE),
+          mean_lat = median(decimalLongitude,na.rm=T)
+        )%>%
+        mutate(
+          warm_flag = case_when(
+            q95 < 38 ~ "tropical",
+            q95 < 41 ~ "southern_range_edge",
+            q95 < 43.2 ~ "possible_warm_water",
+            TRUE ~ "northern_species"
+          )
+        )%>%
+        left_join(.,gbif_df%>%
+                    distinct(species,.keep_all=TRUE)%>%
+                    dplyr::select(kingdom,phylum,class,order,genus,family,species,speciesKey))%>%
+        left_join(.,data.frame(rbind(data.frame(speciesKey=raresp,selection="rare"),
+                                     data.frame(speciesKey=medsp1,selection="less than 2000 obs"))))
 
-#save the output --
-write.csv(species_stats,"output/species_stats.csv",row.names=FALSE)
+      #save the output --
+      write.csv(species_stats,"output/species_stats.csv",row.names=FALSE)
 
 ############################################################
 # ----  Aquamaps integration  ----
 ############################################################
 
-# ----  One-time setup (run once) ----
-# Install AquaMaps database (~2GB download, ~10GB unpacked)
-#download_db()
+      # ----  One-time setup (run once) ----
+      # Install AquaMaps database (~2GB download, ~10GB unpacked)
+      #download_db()
 
-# Set database type
-default_db("sqlite")
+      # Set database type
+      default_db("sqlite")
 
-# Connect to AquaMaps database
-con <- con_am("sqlite")
+      # Connect to AquaMaps database
+      con <- con_am("sqlite")
 
 ############################################################
 # ---- flag anythign missing from the table ----
 ############################################################
 
 #some species are missing from the GBIF pull from the warm water species table in the figure
-missing_targets <- c(setdiff(warm_sp_manual%>%filter(Taxon.Level=="genus")%>%pull(Taxon.Name),
+                  c(setdiff(warm_sp_manual%>%filter(Taxon.Level=="genus")%>%pull(Taxon.Name),
                             species_stats%>%distinct(genus,.keep_all=TRUE)%>%pull(genus)),
 
                     setdiff(warm_sp_manual%>%filter(Taxon.Level=="family")%>%pull(Taxon.Name),
@@ -391,25 +405,20 @@ missing_targets <- c(setdiff(warm_sp_manual%>%filter(Taxon.Level=="genus")%>%pul
 
 problem_species <- aquamaps_results%>%filter(is.na(weighted_lat)|is.na(q95_lat)|is.na(coastal_overlap))%>%pull(species)
 
-  #run checks
-    #1) does the name work with aquamaps, is there an accepted name to replace the synonym - aquamaps results can be reassessed using the accepted name in this case
-    #2) if name is good, does aquamaps have a map for it
-    #3) if yes to 1) and 2) where is the species based on the fishbase FAO region 21/31 being the study area and if no FAO is the 'country' recorded for that species
-
-  #set up a cropped Atlantic for the mask
-  bound_box <- st_bbox(c(
-    xmin = -100, xmax = -40,
-    ymin = 13,  ymax = 85
-  ), crs = st_crs(4326))
+   #set up a cropped Atlantic for the mask
+  bound_box <- filter_range #set above
 
   #load the atlantic mask - see 'Build an Atlantic mask' in code/00_functions.R for code to do this.
-  atlantic_bb <- read_sf("data/Atlantic_bounding.shp")st_transform(4326)
+  atlantic_bb <- read_sf("data/Atlantic_bounding.shp")%>%st_transform(4326)
   atlantic_vect <- terra::vect(atlantic_bb)
 
-  species_problem_table2 <- species_problem_table
+  #run the analysis of the species that were not assigned a classification based on aquamaps
 
+      #run checks
+      #1) does the name work with aquamaps, is there an accepted name to replace the synonym - aquamaps results can be reassessed using the accepted name in this case
+      #2) if name is good, does aquamaps have a map for it
+      #3) if yes to 1) and 2) where is the species based on the fishbase FAO region 21/31 being the study area and if no FAO is the 'country' recorded for that species
 
-  #run the analysis
   species_problem_table <- resolve_species_vector(problem_species,bound_box = bound_box,atlantic_vect=atlantic_vect) #takes a while so saved below
 
   #save outputs
@@ -417,15 +426,19 @@ problem_species <- aquamaps_results%>%filter(is.na(weighted_lat)|is.na(q95_lat)|
 
 #first check for synonyms that might work on fishbase
 
-    #find synonyms
-    lookup <- data.frame(
-      species = problem_species,
-      checked = map_chr(problem_species, fishbase_syn_check)
-    )
+    # #find synonyms
+    # lookup <- data.frame(
+    #   species = problem_species,
+    #   checked = map_chr(problem_species, fishbase_syn_check)
+    # )
+    #
+    # lookup <- lookup%>%
+    #           mutate(match=species==checked)%>%
+    #           left_join(.,species_problem_table%>%rename(species=input_name))
 
-    lookup <- lookup%>%
-              mutate(match=species==checked)%>%
-              left_join(.,species_problem_table%>%rename(species=input_name))
+    #write.csv(lookup,file="output/problem_synonym_speciesIDs.csv",row.names=FALSE) #load this for quick reference.
+
+    lookup <- read.csv("output/problem_synonym_speciesIDs.csv")
 
     syn_species <- lookup%>%filter(!match)
 
@@ -440,7 +453,6 @@ problem_species <- aquamaps_results%>%filter(is.na(weighted_lat)|is.na(q95_lat)|
 
     }
 
-    #re-run for the new synonyms
 
     syn_species2 <- matched_sp%>%filter(!is.na(name))%>%pull(name)
 
@@ -452,88 +464,80 @@ problem_species <- aquamaps_results%>%filter(is.na(weighted_lat)|is.na(q95_lat)|
                         )
 
     aquamaps_results2 <- read.csv("output/aquamaps_results.csv")%>%
-                         filter(species %in% syn_species2,!is.na(weighted_lat))%>%
-                         rename(matched_name=species)%>%
-                         left_join(.,lookup%>%dplyr::select(species,matched_name))%>%
-                         dplyr::select(names(aquamaps_results))
+                          filter(species %in% syn_species2,!is.na(weighted_lat))%>%
+                          rename(matched_name=species)%>%
+                          left_join(.,lookup%>%dplyr::select(species,matched_name))%>%
+                          dplyr::select(names(aquamaps_results))
+
+
+    #key out the problem species into ones to include or not
+
+    syn_fixed_sp <- matched_sp%>%filter(!is.na(name))%>%pull(species)
+
+    prob_sp_clean <- species_problem_table%>%
+                     rename(species=input_name)%>%
+                     filter(status!="aquamaps_outside_bbox",
+                            !species %in% syn_fixed_sp)%>%
+                     dplyr::select(-FAO_region,-country,-speciesKey)%>%
+                     mutate(keep=case_when(
+                       is.na(overlaps) & !in_study_region ~ FALSE,
+                       is.na(overlaps) & in_study_region ~ TRUE,
+                       overlaps ~ TRUE,
+                       TRUE ~ NA
+                     ))
+
+    #species we can keep for consideration though we cannot say whether they are 'warm water'
+    prob_sp_clean%>%filter(keep)
+
+    #Species lacking any aquamaps raster and were note keyed to a specific region
+    prob_sp_clean%>%filter(!keep)
+    prob_sp_clean%>%left_join(species_problem_table%>%
+                                rename(species=input_name)%>%
+                                dplyr::select(species,FAO_region))%>%
+                    filter(!keep,grepl("atlantic",tolower(FAO_region))) #only southwest or eastern atlantic
+
+    prob_sp_clean%>%filter(is.na(keep)) #manually checked all outside of our study region
+
+    write.csv(prob_sp_clean,file="problem_species_key.csv")
+
+
+    problem_sp_remove <- prob_sp_clean%>%filter(!keep | is.na(keep))%>%pull(species)
 
     aquamaps_results_updated <- aquamaps_results%>%
                                 filter(!species %in% aquamaps_results2$species)%>%
-                                bind_rows(aquamaps_results2)
+                                bind_rows(aquamaps_results2)%>%
+                                mutate(
+                                  warm_flag_am = case_when(
+                                    q95_lat < 38 ~ "tropical",
+                                    q95_lat < 41 ~ "southern_range_edge",
+                                    q95_lat < 43.2 ~ "possible_warm_water",
+                                    is.na(q95_lat) ~ NA,
+                                    TRUE ~ "northern_species"
+                                  ))%>%
+                                 filter(!species %in% problem_sp_remove) #these species can be removed
+
+    write.csv(aquamaps_results_updated,"output/aquamaps_check_final.csv",row.names = FALSE)
+
+ ########################################################################
+ # ---- Now key out the warm water species based on all these checks  ----
+ ########################################################################
+
+  #species that aquamaps identified as tropical
+    grouped_assessment <- species_stats%>%
+                          left_join(.,aquamaps_results_updated)
+
+   tropical <- grouped_assessment%>%
+                mutate(keep=case_when(warm_flag == "northern_species" | warm_flag_am == "northern_species" ~ FALSE, #use this conservative definition
+                                      warm_flag == "tropical" & warm_flag_am == "southern_range_edge" ~ TRUE,
+                                      warm_flag_am == "tropical" & warm_flag == "southern_range_edge" ~ TRUE,
+                                      warm_flag == "tropical" & warm_flag_am == "tropical" ~ TRUE,
+                                      TRUE ~ FALSE))%>%
+               filter(keep)%>%
+               dplyr::select(species)%>%
+               distinct(species,.keep_all=TRUE)
 
 
-
-#status == "aquamaps_match"
-  #check species that passed the test but this may be due to very low overlap or erroneous distributions
-  am_match_species <- species_problem_table%>%filter(status=="aquamaps_match")%>%pull(input_name)
-
-  am_match_fao <- NULL
-  for(i in am_match_species){
-
-    temp <- rfishbase::faoareas(i)%>%data.frame()%>%dplyr::select(AreaCode)
-
-    if(length(tryCatch(intersect(c(21,31),temp$AreaCode), error = function(e) NULL))==0){am_match_fao=c(am_match_fao,FALSE)}else{am_match_fao=c(am_match_fao,TRUE)}
-
-  }
-
-  #"Gymnocanthus galeatus" = small amount of projected habitat in easter arctic, but not within FAO 21 or 31
-  #"Pleuronectes platessa"= small amount of habitat around greenland
-
-  am_match_species[am_match_fao] #which species are in the right FAO but are also near the region
-
-
-############################################################
-# ---- Knit it all together  ----
-############################################################
-
-
-aquamaps_results <- read.csv("output/aquamaps_results.csv")%>%
-                    filter(species %in% c(species_stats$species,missing_targets%>%pull(species2)))%>%
-                    mutate(warm_flag_am = case_when(
-                      q95_lat < 38 ~ "tropical",
-                      q95_lat < 41 ~ "southern_range_edge",
-                      q95_lat < 43.2 ~ "possible_warm_water",
-                      is.na(q95_lat) ~ NA,
-                      TRUE ~ "northern_species"
-                    ))
-
-warm_water_summary <- species_stats%>%
-                      left_join(.,aquamaps_results)%>%
-                      mutate()
-
-
-aquamaps_results_rare <- read.csv("output/aquamaps_results.csv")%>% #reload and trim
-                         filter(species %in% tropical_sp)%>%
-                         mutate(warm_flag_am = case_when(
-                           q95_lat < 38 ~ "tropical",
-                           q95_lat < 41 ~ "southern_range_edge",
-                           q95_lat < 43.2 ~ "possible_warm_water",
-                           is.na(q95_lat) ~ NA,
-                           TRUE ~ "northern_species"
-                         ))%>%mutate(species_selection="rare")
-
-med_tropical_species <- species_stats%>%filter(species_selection=="medium",warm_flag == "tropical")
-
-aquamaps_results_med <- read.csv("output/aquamaps_results.csv")%>% #reload and trim
-                          filter(species %in% med_species$species)%>%
-                          mutate(warm_flag_am = case_when(
-                            q95_lat < 38 ~ "tropical",
-                            q95_lat < 41 ~ "southern_range_edge",
-                            q95_lat < 43.2 ~ "possible_warm_water",
-                            is.na(q95_lat) ~ NA,
-                            TRUE ~ "northern_species"
-                          ))%>%mutate(species_selection="medium")
-
-
-
-
-ggplot(warm_water_summary,aes(q95,q95_lat))+
-  geom_point()+
-  theme_bw()+
-  geom_hline(yintercept=43,linetype=2)+
-  stat_smooth(method="lm")+
-  labs(x="GBIF 95th percentile °lat",
-       y="Aquamaps weighted mean °lat")
+   write.csv(tropical,"output/tropical_species_candidates.csv",row.names=FALSE)
 
 ###########################################################
 # ---- raster plots tropical species matching to Hunter's montage (Figure 1) ----
